@@ -1,0 +1,15 @@
+keep/
+results*
+wandb/
+data*
+percentage*
+__pycache__/
+.ipynb_checkpoints/
+*.csv
+*.mat
+*.pdf
+*.png
+*.mm
+*.asv
+7DoF*
+Comparative_Results_with_Numerical_Methods/
