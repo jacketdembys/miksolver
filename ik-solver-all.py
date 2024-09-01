@@ -342,7 +342,7 @@ if __name__ == '__main__':
     if save_option == "cloud":
         run = wandb.init(
             entity="jacketdembys",
-            project = "ik-steps",                
+            project = "ik-steps-next",                
             group = network_type+"_"+"Combined_Dataset_"+str(dataset_samples)+"_Scale_"+str(int(scale))+"_"+dataset_type+"_"+loss_choice,  # "_seq", "_1_to_1"
             #group = "Dataset_Scale_"+str(int(scale)),
             name = "Model_"+robot_choice+"_" \
