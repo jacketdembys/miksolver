@@ -101,7 +101,7 @@ if __name__ == '__main__':
 
     elif robot_choice == "All-6DoF":
         if dataset_type == "combine":
-            n_DoF = 7
+            n_DoF = 6
             input_dim = 6+6+6
             output_dim = 6
 
@@ -169,6 +169,7 @@ if __name__ == '__main__':
             
             robot_list = ["6DoF-6R-Jaco", "6DoF-6R-Puma560", "6DoF-6R-Mico", "6DoF-6R-IRB140", "6DoF-6R-KR5", 
                           "6DoF-6R-UR10", "6DoF-6R-UR3", "6DoF-6R-UR5", "6DoF-6R-Puma260", "6DoF-2RP3R-Stanford"]
+
 
             data = np.zeros((dataset_samples, 24, len(robot_list)))           
             for i in range(len(robot_list)):
