@@ -99,7 +99,7 @@ for joint_variation in range(1,2):
                 'RESUMED_G_MODEL': "",
             },
             'HYPERPARAMETERS': {
-                'EPOCHS': 1000,
+                'EPOCHS': 5,
                 'BATCH_SIZE': 128, #100000
                 'SHUFFLE': True,
                 'NUM_WORKERS': 4,
