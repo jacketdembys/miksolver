@@ -86,7 +86,7 @@ for joint_variation in range(1,2):
         },             
         'TRAIN': {
             'DATASET': {
-                'NUM_SAMPLES': 1000000,
+                'NUM_SAMPLES': 100000,
                 'JOINT_LIMIT_SCALE': int(scale),
                 'JOINT_VARIATION': int(joint_variation),
                 'TYPE':'combine', # 1_to_1, seq, combine
@@ -106,7 +106,7 @@ for joint_variation in range(1,2):
                 'PIN_MEMORY': False,
                 'PERSISTENT_WORKERS': True,
                 'OPTIMIZER_NAME': 'Adam', # Adam, SGD
-                'LEARNING_RATE': 1e-3, #0.0001, # MLP / RMLP -> 0.001 and DMLP -> 0.0001
+                'LEARNING_RATE': 1e-2, #0.0001, # MLP / RMLP -> 0.001 and DMLP -> 0.0001
                 'BETAS': [0.9, 0.999],
                 'EPS': 0.00001,
                 'WEIGHT_DECAY': 0.0,
