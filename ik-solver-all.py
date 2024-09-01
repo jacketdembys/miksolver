@@ -69,6 +69,7 @@ if __name__ == '__main__':
     save_option = config["TRAIN"]["CHECKPOINT"]["SAVE_OPTIONS"]                                # local or cloud
     load_option = config["TRAIN"]["CHECKPOINT"]["LOAD_OPTIONS"]  
     dataset_type = config["TRAIN"]["DATASET"]["TYPE"]
+    joint_steps = config["TRAIN"]["DATASET"]["JOINT_VARIATION"]
     orientation_type = config["TRAIN"]["DATASET"]["ORIENTATION"]
 
     scale = config["TRAIN"]["DATASET"]["JOINT_LIMIT_SCALE"]
@@ -155,15 +156,15 @@ if __name__ == '__main__':
     
     if load_option == "cloud":
         if dataset_type == "1_to_1":
-            data = pd.read_csv('/home/other-datasets/'+robot_choice+'/data_'+robot_choice+'_'+str(int(dataset_samples))+'_qlim_scale_'+str(int(scale))+'_seq.csv')
+            data = pd.read_csv('/home/other-datasets/'+robot_choice+'/data_'+robot_choice+'_'+str(int(dataset_samples))+'_qlim_scale_'+str(int(scale))+'_seq'+str(joint_steps)+'.csv')
         elif dataset_type == "seq":
-            data = pd.read_csv('/home/other-datasets/'+robot_choice+'/data_'+robot_choice+'_'+str(int(dataset_samples))+'_qlim_scale_'+str(int(scale))+'_seq.csv')
+            data = pd.read_csv('/home/other-datasets/'+robot_choice+'/data_'+robot_choice+'_'+str(int(dataset_samples))+'_qlim_scale_'+str(int(scale))+'_seq'+str(joint_steps)+'.csv')
     elif load_option == "local":
         if dataset_type == "1_to_1":
             #data = pd.read_csv('../docker/datasets/'+robot_choice+'/data_'+robot_choice+'_'+str(int(dataset_samples))+'_qlim_scale_'+str(int(scale))+'_const.csv')
-            data = pd.read_csv('../docker/other-datasets/'+robot_choice+'/data_'+robot_choice+'_'+str(int(dataset_samples))+'_qlim_scale_'+str(int(scale))+'_seq_3.csv') #+'_'+orientation_type+'.csv')
+            data = pd.read_csv('../docker/other-datasets/'+robot_choice+'/data_'+robot_choice+'_'+str(int(dataset_samples))+'_qlim_scale_'+str(int(scale))+'_seq_'+str(joint_steps)+'.csv') #+'_'+orientation_type+'.csv')
         elif dataset_type == "seq":
-            data = pd.read_csv('../docker/other-datasets/'+robot_choice+'/data_'+robot_choice+'_'+str(int(dataset_samples))+'_qlim_scale_'+str(int(scale))+'_seq_3.csv')
+            data = pd.read_csv('../docker/other-datasets/'+robot_choice+'/data_'+robot_choice+'_'+str(int(dataset_samples))+'_qlim_scale_'+str(int(scale))+'_seq_'+str(joint_steps)+'.csv')
         elif dataset_type == "combined":
             
             robot_list = ["6DoF-6R-Jaco", "6DoF-6R-Puma560", "6DoF-6R-Mico", "6DoF-6R-IRB140", "6DoF-6R-KR5", 
@@ -171,7 +172,7 @@ if __name__ == '__main__':
 
             data = np.zeros((dataset_samples, 24, len(robot_list)))           
             for i in range(len(robot_list)):
-                df = pd.read_csv('../docker/datasets/6DoF-Combined/review_data_'+robot_list[i]+'_'+str(int(dataset_samples))+'_qlim_scale_'+str(int(scale))+'_seq_'+str(int(scale))+'.csv')
+                df = pd.read_csv('../docker/datasets/6DoF-Combined/review_data_'+robot_list[i]+'_'+str(int(dataset_samples))+'_qlim_scale_'+str(int(scale))+'_seq_'+str(joint_steps)+'.csv')
                 data[:,:,i] = np.array(df)
 
                 
@@ -285,6 +286,8 @@ if __name__ == '__main__':
         optimizer = optim.SGD(model.parameters(), lr=learning_rate, momentum=0.9, nesterov=True)
     elif optimizer_choice == "Adam":
         optimizer = optim.Adam(model.parameters(), lr=learning_rate)
+    elif optimizer_choice == "AdamW":
+        optimizer = optim.AdamW(model.parameters(), lr=learning_rate)
     elif optimizer_choice == "Adadelta":
         optimizer = optim.Adadelta(model.parameters())
     elif optimizer_choice == "RMSprop":
@@ -302,7 +305,7 @@ if __name__ == '__main__':
 
 
     print("\n==> Experiment {} Training network: {}".format(experiment_number, model.name))
-    print("==> Training device: {}".format(device))
+    print("==> Training for joint step {} on device: {}".format(joint_steps, device))
     
 
     # create a directory to save weights
@@ -313,7 +316,7 @@ if __name__ == '__main__':
     # results_fkloss
     save_path = "results_final_combine/"+robot_choice+"/"+network_type+"_"+robot_choice+"_" \
                 + save_layers_str + "_neurons_" + str(neurons) + "_batch_" + str(batch_size)  +"_" \
-                +optimizer_choice+"_"+loss_choice+"_"+str(experiment_number)+'_qlim_scale_'+str(int(scale))+'_samples_'+str(dataset_samples)+"_"+dataset_type+"_"+orientation_type+"_"+str(learning_rate)
+                +optimizer_choice+"_"+loss_choice+"_"+str(experiment_number)+'_qlim_scale_'+str(int(scale))+'_samples_'+str(dataset_samples)+"_"+dataset_type+"_"+orientation_type+"_"+str(learning_rate)+"_js_"+str(joint_steps)
 
     if not os.path.exists(save_path):
         os.makedirs(save_path)
@@ -344,7 +347,7 @@ if __name__ == '__main__':
             #group = "Dataset_Scale_"+str(int(scale)),
             name = "Model_"+robot_choice+"_" \
                     + save_layers_str + "_neurons_" + str(neurons) + "_batch_" + str(batch_size) +"_" \
-                    +optimizer_choice+"_"+loss_choice+"_run_"+str(experiment_number)+'_qlim_scale_'+str(int(scale))+'_samples_'+str(dataset_samples)+"_"+orientation_type+"_"+str(learning_rate)   #+'_non_traj_split', '_traj_split'   
+                    +optimizer_choice+"_"+loss_choice+"_run_"+str(experiment_number)+'_qlim_scale_'+str(int(scale))+'_samples_'+str(dataset_samples)+"_"+orientation_type+"_"+str(learning_rate)+"_js_"+str(joint_steps)   #+'_non_traj_split', '_traj_split'   
             #name = "Model_"+robot_choice+"_" \
             #        +model.name.replace(" ","").replace("[","_").replace("]","_").replace(",","-") \
             #        +optimizer_choice+"_"+loss_choice+"_run_"+str(experiment_number)+'_qlim_scale_'+str(int(scale))+'_samples_'+str(dataset_samples)
@@ -589,7 +592,7 @@ if __name__ == '__main__':
                 "device_name": device_name,
                 "robot_choice": robot_choice,
                 "data_size": dataset_samples,
-                "joints_scale": scale,
+                "joints_scale": joint_steps,
                 "architecture": model.name,
                 "network": network_type,
                 "layers": layers,
