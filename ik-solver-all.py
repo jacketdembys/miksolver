@@ -159,6 +159,17 @@ if __name__ == '__main__':
             data = pd.read_csv('/home/other-datasets/'+robot_choice+'/data_'+robot_choice+'_'+str(int(dataset_samples))+'_qlim_scale_'+str(int(scale))+'_seq'+str(joint_steps)+'.csv')
         elif dataset_type == "seq":
             data = pd.read_csv('/home/other-datasets/'+robot_choice+'/data_'+robot_choice+'_'+str(int(dataset_samples))+'_qlim_scale_'+str(int(scale))+'_seq'+str(joint_steps)+'.csv')
+        elif dataset_type == "combined":
+            
+            robot_list = ["6DoF-6R-Jaco", "6DoF-6R-Puma560", "6DoF-6R-Mico", "6DoF-6R-IRB140", "6DoF-6R-KR5", 
+                          "6DoF-6R-UR10", "6DoF-6R-UR3", "6DoF-6R-UR5", "6DoF-6R-Puma260", "6DoF-2RP3R-Stanford"]
+
+
+            data = np.zeros((dataset_samples, 24, len(robot_list)))           
+            for i in range(len(robot_list)):
+                df = pd.read_csv('/home/datasets/6DoF-Combined/review_data_'+robot_list[i]+'_'+str(int(dataset_samples))+'_qlim_scale_'+str(int(scale))+'_seq_'+str(joint_steps)+'.csv')
+                data[:,:,i] = np.array(df)
+    
     elif load_option == "local":
         if dataset_type == "1_to_1":
             #data = pd.read_csv('../docker/datasets/'+robot_choice+'/data_'+robot_choice+'_'+str(int(dataset_samples))+'_qlim_scale_'+str(int(scale))+'_const.csv')
