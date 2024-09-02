@@ -354,7 +354,7 @@ if __name__ == '__main__':
     if save_option == "cloud":
         run = wandb.init(
             entity="jacketdembys",
-            project = "ik-steps-next",                
+            project = "ik-steps",                
             group = network_type+"_"+"Combined_Dataset_"+str(dataset_samples)+"_Scale_"+str(int(scale))+"_"+dataset_type+"_"+loss_choice,  # "_seq", "_1_to_1"
             #group = "Dataset_Scale_"+str(int(scale)),
             name = network_type+"_"+robot_choice+"_" \
@@ -392,7 +392,7 @@ if __name__ == '__main__':
         #print(valid_loss)
         #sys.exit()
 
-        #scheduler.step(valid_loss)
+        scheduler.step(valid_loss)
 
         train_losses.append(train_loss)
         valid_losses.append(valid_loss)

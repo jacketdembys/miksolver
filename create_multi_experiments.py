@@ -79,14 +79,14 @@ for joint_variation in range(1,2):
         'SEED_NUMBER': int(seed_choice),
         'DEVICE_ID': int(gpu_id),
         'MODEL': {
-            'NAME': 'DenseMLP3',      # MLP, ResMLP, DenseMLP3, DenseMLP 
+            'NAME': 'ResMLP',      # MLP, ResMLP, DenseMLP3, DenseMLP 
             'NUM_HIDDEN_LAYERS': layers,          
             'NUM_HIDDEN_NEURONS': neurons,
             'NUM_BLOCKS': num_blocks
         },             
         'TRAIN': {
             'DATASET': {
-                'NUM_SAMPLES': 100000,
+                'NUM_SAMPLES': 1000000,
                 'JOINT_LIMIT_SCALE': int(scale),
                 'JOINT_VARIATION': int(joint_variation),
                 'TYPE':'combine', # 1_to_1, seq, combine
