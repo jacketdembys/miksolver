@@ -112,6 +112,14 @@ def get_DH(robot_choice, t):
                            [ t[3],    0.0,      0.0, -torch.pi/2],
                            [ t[4],    0.0,      0.0,  torch.pi/2],
                            [ t[5],    0.0,      0.0,         0.0]])
+    elif robot_choice == "7DoF-7R-Jaco2":
+        DH = torch.tensor([[   t[0]+torch.pi,     -0.2755,          0,         torch.pi/2],
+                            [           t[1],         0.0,          0,         torch.pi/2],
+                            [           t[2],       -0.41,          0,         torch.pi/2],
+                            [           t[3],     -0.0098,          0,         torch.pi/2],
+                            [           t[4],     -0.3111,          0,         torch.pi/2],
+                            [           t[5],         0.0,          0,         torch.pi/2],
+                            [t[6]+torch.pi/2,     -0.2638,          0,           torch.pi]])
     elif robot_choice == "7DoF-7R-Panda":
         DH = torch.tensor([[t[0],    0.333,      0.0,           0],
                            [t[1],      0.0,      0.0, -torch.pi/2],
@@ -120,7 +128,31 @@ def get_DH(robot_choice, t):
                            [t[4],    0.384,  -0.0825, -torch.pi/2],
                            [t[5],      0.0,      0.0,  torch.pi/2],
                            [t[6],    0.107,    0.088,  torch.pi/2]])
-    elif robot_choice == "7DoF-Kuka-LWR":
+    elif robot_choice == "7DoF-7R-WAM":
+        DH = torch.tensor([[t[0],      0.0,      0.0, -torch.pi/2],
+                           [t[1],      0.0,      0.0,  torch.pi/2],
+                           [t[2],    0.550,      0.0, -torch.pi/2],
+                           [t[3],      0.0,    0.045,  torch.pi/2],
+                           [t[4],    0.300,   -0.045, -torch.pi/2],
+                           [t[5],      0.0,      0.0,  torch.pi/2],
+                           [t[6],    0.060,      0.0,         0.0]])
+    elif robot_choice == "7DoF-7R-Baxter":
+        DH = torch.tensor([[           t[0],     0.27,    0.069, -torch.pi/2],
+                           [t[1]+torch.pi/2,      0.0,      0.0,  torch.pi/2],
+                           [           t[2],    0.364,    0.069, -torch.pi/2],
+                           [           t[3],      0.0,      0.0,  torch.pi/2],
+                           [           t[4],    0.374,     0.01, -torch.pi/2],
+                           [           t[5],      0.0,      0.0,  torch.pi/2],
+                           [           t[6],     0.28,      0.0,         0.0]])
+    elif robot_choice == "7DoF-7R-Sawyer":
+        DH = torch.tensor([[t[0],    0.317,    0.081, -torch.pi/2],
+                           [t[1],   0.1925,      0.0, -torch.pi/2],
+                           [t[2],      0.4,      0.0, -torch.pi/2],
+                           [t[3],   0.1685,      0.0, -torch.pi/2],
+                           [t[4],      0.4,      0.0, -torch.pi/2],
+                           [t[5],   0.1363,      0.0, -torch.pi/2],
+                           [t[6],   0.1338,      0.0,         0.0]])
+    elif robot_choice == "7DoF-7R-KukaLWR4+":
         # https://www.researchgate.net/publication/351149270_Exoscarne_Assistive_Strategies_for_an_Industrial_Meat_Cutting_System_Based_on_Physical_Human-Robot_Interaction
         DH = torch.tensor([[t[0],   0.3105,      0.0,  torch.pi/2],
                            [t[1],      0.0,      0.0, -torch.pi/2],
@@ -129,7 +161,31 @@ def get_DH(robot_choice, t):
                            [t[4],     0.39,      0.0,  torch.pi/2],
                            [t[5],      0.0,      0.0, -torch.pi/2],
                            [t[6],    0.078,      0.0,         0.0]])
-    elif robot_choice == "7DoF-GP66":
+    elif robot_choice == "7DoF-7R-PR2Arm":
+        DH = torch.tensor([[t[0],    0.333,      0.0, -torch.pi/2],
+                           [t[1],      0.0,    0.350,  torch.pi/2],
+                           [t[2],      0.0,    0.400,  torch.pi/2],
+                           [t[3],      0.4,      0.0, -torch.pi/2],
+                           [t[4],      0.0,      0.0,  torch.pi/2],
+                           [t[5],      0.0,      0.0, -torch.pi/2],
+                           [t[6],    0.082,      0.0,         0.0]])
+    elif robot_choice == "7DoF-7R-PA10":
+        DH = torch.tensor([[t[0],    0.317,      0.0, -torch.pi/2],
+                           [t[1],      0.0,      0.0,  torch.pi/2],
+                           [t[2],    0.450,      0.0, -torch.pi/2],
+                           [t[3],      0.0,      0.0,  torch.pi/2],
+                           [t[4],    0.480,      0.0, -torch.pi/2],
+                           [t[5],      0.0,      0.0,  torch.pi/2],
+                           [t[6],    0.070,      0.0,         0.0]])
+    elif robot_choice == "7DoF-7R-Gen3":
+        DH = torch.tensor([[         t[0],  -0.2848,      0.0,  torch.pi/2],
+                           [t[1]+torch.pi,  -0.0118,      0.0,  torch.pi/2],
+                           [t[2]+torch.pi,  -0.4208,      0.0,  torch.pi/2],
+                           [t[3]+torch.pi,  -0.0128,      0.0,  torch.pi/2],
+                           [t[4]+torch.pi,  -0.3143,      0.0,  torch.pi/2],
+                           [t[5]+torch.pi,      0.0,      0.0,  torch.pi/2],
+                           [t[6]+torch.pi,  -0.1674,      0.0,    torch.pi]])
+    elif robot_choice == "7DoF-2RP4R-GP66+1":
         DH = torch.tensor([[t[0],    0.0,      0.0,  torch.pi/2],
                            [t[1],    0.0,     0.25,  torch.pi/2],
                            [ 0.0,   t[2],      0.0,         0.0],
@@ -734,7 +790,7 @@ def load_all_dataset(data, n_DoF, batch_size, robot_choice, dataset_type, device
     train_test_val_all = {}
 
     for i in range(len(robot_list)):
-        if dataset_type == "combine":
+        if dataset_type == "combine-6DoF" or dataset_type == "combine-7DoF":
             print("\n==> Sequence dataset for {}...".format(robot_list[i]))
             # get the input
             X = data[:,:input_dim,i]

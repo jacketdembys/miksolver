@@ -100,13 +100,22 @@ if __name__ == '__main__':
         joint_header = ["t1", "t2", "t3", "t4", "t5", "t6"]
 
     elif robot_choice == "All-6DoF":
-        if dataset_type == "combine":
+        if dataset_type == "combine-6DoF":
             n_DoF = 6
             input_dim = 6+6+6
             output_dim = 6
 
         pose_header = ["x", "y", "z","R","P","Y"]
         joint_header = ["t1", "t2", "t3", "t4", "t5", "t6"]
+
+    elif robot_choice == "All-7DoF":
+        if dataset_type == "combine-7DoF":
+            n_DoF = 7
+            input_dim = 6+7+6
+            output_dim = 7
+
+        pose_header = ["x", "y", "z","R","P","Y"]
+        joint_header = ["t1", "t2", "t3", "t4", "t5", "t6", "t7"]
    
     if robot_choice == "7DoF-7R-Panda" or robot_choice == "7DoF-GP66":
         if dataset_type == "1_to_1":
@@ -159,15 +168,24 @@ if __name__ == '__main__':
             data = pd.read_csv('/home/other-datasets/'+robot_choice+'/data_'+robot_choice+'_'+str(int(dataset_samples))+'_qlim_scale_'+str(int(scale))+'_seq'+str(joint_steps)+'.csv')
         elif dataset_type == "seq":
             data = pd.read_csv('/home/other-datasets/'+robot_choice+'/data_'+robot_choice+'_'+str(int(dataset_samples))+'_qlim_scale_'+str(int(scale))+'_seq'+str(joint_steps)+'.csv')
-        elif dataset_type == "combine":
+        elif dataset_type == "combine-6DoF":
             
             robot_list = ["6DoF-6R-Jaco", "6DoF-6R-Puma560", "6DoF-6R-Mico", "6DoF-6R-IRB140", "6DoF-6R-KR5", 
                           "6DoF-6R-UR10", "6DoF-6R-UR3", "6DoF-6R-UR5", "6DoF-6R-Puma260", "6DoF-2RP3R-Stanford"]
 
-
             data = np.zeros((dataset_samples, 24, len(robot_list)))           
             for i in range(len(robot_list)):
                 df = pd.read_csv('/home/datasets/6DoF-Combined/review_data_'+robot_list[i]+'_'+str(int(dataset_samples))+'_qlim_scale_'+str(int(scale))+'_seq_'+str(joint_steps)+'.csv')
+                data[:,:,i] = np.array(df)
+
+        elif dataset_type == "combine-7DoF":
+
+            robot_list = ["7DoF-7R-Jaco2", "7DoF-7R-Panda", "7DoF-7R-WAM", "7DoF-7R-Baxter", "7DoF-7R-Sawyer", 
+                          "7DoF-7R-KukaLWR4+", "7DoF-7R-PR2Arm", "7DoF-7R-PA10", "7DoF-7R-Gen3", "7DoF-2RP4R-GP66+1"]
+
+            data = np.zeros((dataset_samples, 26, len(robot_list)))           
+            for i in range(len(robot_list)):
+                df = pd.read_csv('/home/datasets/7DoF-Combined/review_data_'+robot_list[i]+'_'+str(int(dataset_samples))+'_qlim_scale_'+str(int(scale))+'_seq_'+str(joint_steps)+'.csv')
                 data[:,:,i] = np.array(df)
     
     elif load_option == "local":
@@ -176,7 +194,7 @@ if __name__ == '__main__':
             data = pd.read_csv('../docker/other-datasets/'+robot_choice+'/data_'+robot_choice+'_'+str(int(dataset_samples))+'_qlim_scale_'+str(int(scale))+'_seq_'+str(joint_steps)+'.csv') #+'_'+orientation_type+'.csv')
         elif dataset_type == "seq":
             data = pd.read_csv('../docker/other-datasets/'+robot_choice+'/data_'+robot_choice+'_'+str(int(dataset_samples))+'_qlim_scale_'+str(int(scale))+'_seq_'+str(joint_steps)+'.csv')
-        elif dataset_type == "combine":
+        elif dataset_type == "combine-6DoF":
             
             robot_list = ["6DoF-6R-Jaco", "6DoF-6R-Puma560", "6DoF-6R-Mico", "6DoF-6R-IRB140", "6DoF-6R-KR5", 
                           "6DoF-6R-UR10", "6DoF-6R-UR3", "6DoF-6R-UR5", "6DoF-6R-Puma260", "6DoF-2RP3R-Stanford"]
