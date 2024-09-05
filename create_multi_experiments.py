@@ -89,7 +89,7 @@ for joint_variation in range(1,2):
                 'NUM_SAMPLES': 1000000,
                 'JOINT_LIMIT_SCALE': int(scale),
                 'JOINT_VARIATION': int(joint_variation),
-                'TYPE':'combine-7DoF', # 1_to_1, seq, combine-6DoF, combine-7DoF
+                'TYPE':'combine-6DoF', # 1_to_1, seq, combine-6DoF, combine-7DoF
                 'ORIENTATION': 'RPY' # RPY, Quaternion, DualQuaternion, Rotation, Rotation6d
             },
             'CHECKPOINT': {
