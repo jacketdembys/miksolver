@@ -199,22 +199,21 @@ if __name__ == '__main__':
 
         elif dataset_type == "combine-up-to-7DoF":
 
-            """
+            
             robot_list_6 = ["6DoF-6R-Jaco", "6DoF-6R-Puma560", "6DoF-6R-Mico", "6DoF-6R-IRB140", "6DoF-6R-KR5", 
-                        "6DoF-6R-UR10", "6DoF-6R-UR3", "6DoF-6R-UR5", "6DoF-6R-Puma260", "6DoF-2RP3R-Stanford"]
+                            "6DoF-6R-UR10", "6DoF-6R-UR3", "6DoF-6R-UR5", "6DoF-6R-Puma260", "6DoF-2RP3R-Stanford"]
             
             robot_list_7 = ["7DoF-7R-Jaco2", "7DoF-7R-Panda", "7DoF-7R-WAM", "7DoF-7R-Baxter", "7DoF-7R-Sawyer", 
-                        "7DoF-7R-KukaLWR4+", "7DoF-7R-PR2Arm", "7DoF-7R-PA10", "7DoF-7R-Gen3", "7DoF-2RP4R-GP66+1"]
-            """
+                            "7DoF-7R-KukaLWR4+", "7DoF-7R-PR2Arm", "7DoF-7R-PA10", "7DoF-7R-Gen3", "7DoF-2RP4R-GP66+1"]
             
-            robot_list_6 = ["6DoF-6R-Jaco"]
-            robot_list_7 = ["7DoF-7R-Jaco2"]
+            
+            #robot_list_6 = ["6DoF-6R-Jaco"]
+            #robot_list_7 = ["7DoF-7R-Jaco2"]
                             
             robot_list = robot_list_6 + robot_list_7
 
             data = np.zeros((dataset_samples, 26, len(robot_list)))           
             for i in range(len(robot_list)):
-                #df = pd.read_csv('/home/datasets/7DoF-Combined/review_data_'+robot_list[i]+'_'+str(int(dataset_samples))+'_qlim_scale_'+str(int(scale))+'_seq_'+str(joint_steps)+'.csv')
                 if robot_list[i] in robot_list_6:
                     df = pd.read_csv('/home/datasets/6DoF-Combined/review_data_'+robot_list[i]+'_'+str(int(dataset_samples))+'_qlim_scale_'+str(int(scale))+'_seq_'+str(joint_steps)+'.csv')
                     df['t7_c'] = 0              # Add a column at the end
