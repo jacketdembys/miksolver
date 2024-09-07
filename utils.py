@@ -790,7 +790,7 @@ def load_all_dataset(data, n_DoF, batch_size, robot_choice, dataset_type, device
     train_test_val_all = {}
 
     for i in range(len(robot_list)):
-        if dataset_type == "combine-6DoF" or dataset_type == "combine-7DoF":
+        if dataset_type == "combine-6DoF" or dataset_type == "combine-7DoF"  or dataset_type == "combine-up-to-7DoF":
             print("\n==> Sequence dataset for {}...".format(robot_list[i]))
             # get the input
             X = data[:,:input_dim,i]
@@ -2124,6 +2124,52 @@ def inference_modified(model, iterator, criterion, device, robot_choice):
         y_pred, _ = model(x)
         y_preds.append(y_pred.detach().cpu().numpy().squeeze())
         y_desireds.append(y.detach().cpu().numpy().squeeze())
+        #X_desireds.append(x.detach().cpu().numpy().squeeze())
+
+
+    y_desireds = np.array(y_desireds)
+    y_preds = np.array(y_preds)
+    #X_desireds = np.array(X_desireds)
+    X_desireds, X_preds, X_errors = reconstruct_pose_modified(y_desireds, y_preds, robot_choice)
+    
+    X_errors_report = np.array([[X_errors.min(axis=0)],
+                                [X_errors.mean(axis=0)],
+                                [X_errors.max(axis=0)],
+                                [X_errors.std(axis=0)]]).squeeze()
+    
+    results = {
+        "y_preds": y_preds,
+        "X_preds": X_preds,
+        "y_desireds": y_desireds,
+        "X_desireds": X_desireds,
+        "X_errors": X_errors,
+        "X_errors_report": X_errors_report
+    }
+    return results
+
+
+def inference_modified_all(model, iterator, criterion, device, robot_choice):
+    model.eval()
+    y_preds = []
+    y_desireds = []
+    X_desireds = []
+    
+    for data in iterator:
+        x = data['input'].to(device)
+        y = data['output'].to(device)
+
+        #x = input_mapping(x,B)
+        
+        y_pred, _ = model(x)
+
+        if '6DoF' in robot_choice:
+            y_preds.append(y_pred[:,:6].detach().cpu().numpy().squeeze())
+            y_desireds.append(y[:,:6].detach().cpu().numpy().squeeze())
+
+        elif '7DoF' in robot_choice:
+            y_preds.append(y_pred.detach().cpu().numpy().squeeze())
+            y_desireds.append(y.detach().cpu().numpy().squeeze())
+
         #X_desireds.append(x.detach().cpu().numpy().squeeze())
 
 
