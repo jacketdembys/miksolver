@@ -436,7 +436,7 @@ if __name__ == '__main__':
             project = "ik-steps",                
             group = network_type+"_"+"Combined_Dataset_"+str(dataset_samples)+"_Scale_"+str(int(scale))+"_"+dataset_type+"_"+loss_choice,  # "_seq", "_1_to_1"
             #group = "Dataset_Scale_"+str(int(scale)),
-            name = network_type+"_"+robot_choice+"_" \
+            name = "New_"+network_type+"_"+robot_choice+"_" \
                     + save_layers_str + "_neurons_" + str(neurons) + "_batch_" + str(batch_size) +"_" \
                     +optimizer_choice+"_"+loss_choice+"_run_"+str(experiment_number)+'_qlim_scale_'+str(int(scale))+'_samples_'+str(dataset_samples)+"_"+orientation_type+"_"+str(learning_rate)+"_js_"+str(joint_steps)   #+'_non_traj_split', '_traj_split'   
             #name = "Model_"+robot_choice+"_" \
