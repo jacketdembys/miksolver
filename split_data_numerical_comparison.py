@@ -18,12 +18,18 @@ if __name__ == '__main__':
 
     # Experiment parameters
     seed_choice = True
-    seed_number = 2
-    robot_choice_list = ['7DoF-7R-Panda', '7DoF-GP66']  # '7DoF-7R-Panda', '7DoF-GP66'
+    seed_number = 1
+    #robot_choice_list = ['7DoF-7R-Panda', '7DoF-GP66']  # '7DoF-7R-Panda', '7DoF-GP66'
+    robot_choice_list = ["6DoF-6R-Jaco", "6DoF-6R-Puma560", "6DoF-6R-Mico", "6DoF-6R-IRB140", "6DoF-6R-KR5",
+                "6DoF-6R-UR10", "6DoF-6R-UR3", "6DoF-6R-UR5", "6DoF-6R-Puma260", "6DoF-2RP3R-Stanford",
+                "7DoF-7R-Jaco2", "7DoF-7R-Panda", "7DoF-7R-WAM", "7DoF-7R-Baxter", "7DoF-7R-Sawyer",
+                "7DoF-7R-KukaLWR4+", "7DoF-7R-PR2Arm", "7DoF-7R-PA10", "7DoF-7R-Gen3", "7DoF-2RP4R-GP66+1"]
 
     for robot_choice in robot_choice_list:
-        for i in range(1,21):
-            data_path = '../docker/datasets/'+robot_choice+'-Steps/review_data_'+robot_choice+'_1000000_qlim_scale_10_seq_'+str(i)+'.csv'
+        print("Splitting for {}:".format(robot_choice))
+        #for i in range(1,2):
+        for i in range(1,2):
+            data_path = '../docker/datasets/'+robot_choice.split('-')[0]+'-Combined/review_data_'+robot_choice+'_1000000_qlim_scale_10_seq_'+str(i)+'.csv'
             
             # Load data
             data = pd.read_csv(data_path)
@@ -57,9 +63,13 @@ if __name__ == '__main__':
             print('Shape of test data: ', data_test.shape)  
         
             # save test sets 
-            data_test_header = ["x_p", "y_p", "z_p", "R_p", "P_p", "Y_p", "t1_p", "t2_p", "t3_p", "t4_p", "t5_p", "t6_p", "t7_p","x_c", "y_c", "z_c", "R_c", "P_c", "Y_c", "t1_c", "t2_c", "t3_c", "t4_c", "t5_c", "t6_c", "t7_c"]
+            if "6DoF" in robot_choice:
+                data_test_header = ["x_p", "y_p", "z_p", "R_p", "P_p", "Y_p", "t1_p", "t2_p", "t3_p", "t4_p", "t5_p", "t6_p","x_c", "y_c", "z_c", "R_c", "P_c", "Y_c", "t1_c", "t2_c", "t3_c", "t4_c", "t5_c", "t6_c"]
+            elif "7DoF" in robot_choice:
+                data_test_header = ["x_p", "y_p", "z_p", "R_p", "P_p", "Y_p", "t1_p", "t2_p", "t3_p", "t4_p", "t5_p", "t6_p", "t7_p","x_c", "y_c", "z_c", "R_c", "P_c", "Y_c", "t1_c", "t2_c", "t3_c", "t4_c", "t5_c", "t6_c", "t7_c"]
+            
             df = pd.DataFrame(data_test)
-            df.to_csv("../docker/datasets/"+robot_choice+"-Steps/review_data_"+robot_choice+"_1000000_qlim_scale_10_seq_"+str(i)+"_test.csv",
+            df.to_csv("../docker/test-datasets/review_data_"+robot_choice+"_1000000_qlim_scale_10_seq_"+str(i)+"_test.csv",
                 index=False,
                 header=data_test_header)  
             

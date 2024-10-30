@@ -7,6 +7,8 @@ function ss = checkIfSingularityHappened(J, Q_current, i)
         if (det_J == 0)
             %fprintf("Singular position at iteration: [%f]", (i));
             ss = i;
+        else
+            ss = 0;
         end
 
     else

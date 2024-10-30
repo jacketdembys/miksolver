@@ -1,6 +1,7 @@
 keep/
 results*
 wandb/
+test-datasets/*
 data*
 percentage*
 __pycache__/

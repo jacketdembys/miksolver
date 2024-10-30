@@ -1,6 +1,17 @@
-function inv_J = getInverseJacobian(J, inverse_chosen, e, robot)
+function inv_J = getInverseJacobian(J, inverse_chosen, e, robot_chosen)
     
     dim = length(6);
+
+
+    robot_list_6DoF_c = {'6DoF-6R-Jaco', '6DoF-6R-Puma560', '6DoF-6R-Mico', '6DoF-6R-IRB140', '6DoF-6R-KR5', ...
+                         '6DoF-6R-UR10', '6DoF-6R-UR3', '6DoF-6R-UR5', '6DoF-6R-Puma260'};
+    robot_list_6DoF_p = { '6DoF-2RP3R-Stanford'};
+
+    robot_list_7DoF_c = {'7DoF-7R-Jaco2', '7DoF-7R-Panda', '7DoF-7R-WAM', '7DoF-7R-Baxter', '7DoF-7R-Sawyer', ...
+                         '7DoF-7R-KukaLWR4+', '7DoF-7R-PR2Arm', '7DoF-7R-PA10', '7DoF-7R-Gen3'};
+     
+    robot_list_7DoF_p = {'7DoF-2RP4R-GP66+1'};
+
 
     %% use the Moore-Penrose (MP) inverse
     if strcmp(inverse_chosen, "MP")                   
@@ -17,14 +28,25 @@ function inv_J = getInverseJacobian(J, inverse_chosen, e, robot)
     %% use the MX inverse 
     elseif strcmp(inverse_chosen, 'MX')              
         %inv_J = mixinv(robot, J); 
-        
-        if strcmp(robot, 'RRPRRRR')
+        if ismember(robot_chosen, robot_list_6DoF_p)
+            iW = J(1:3, 1:3);
+            iX = J(1:3, 4:6);
+            iY = J(4:6, 1:3);
+            iZ = J(4:6, 4:6);       
+            inv_J = comGinv(iW, iX, iY, iZ);
+        elseif ismember(robot_chosen, robot_list_6DoF_c)       
+            iW = J(1:3, 1:4);
+            iX = J(1:3, 5:6);
+            iY = J(4:6, 1:4);
+            iZ = J(4:6, 5:6);       
+            inv_J = comGinv(iW, iX, iY, iZ);
+        elseif ismember(robot_chosen, robot_list_7DoF_p)
             iW = J(1:3, 1:3);
             iX = J(1:3, 4:7);
             iY = J(4:6, 1:3);
             iZ = J(4:6, 4:7);       
             inv_J = comGinv(iW, iX, iY, iZ);
-        elseif strcmp(robot, 'RRRRRRR')        
+        elseif ismember(robot_chosen, robot_list_7DoF_c)        
             iW = J(1:3, 1:4);
             iX = J(1:3, 5:7);
             iY = J(4:6, 1:4);
