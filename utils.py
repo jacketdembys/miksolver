@@ -206,7 +206,11 @@ def get_DH(robot_choice, t):
 
 
 
-
+# Function to check orthogonality of rotation matrix
+def is_orthogonal(matrix):
+    """Check if a rotation matrix is orthogonal by verifying if R * R^T = I."""
+    rotation_part = matrix[:3, :3]  # Extract rotation part
+    return np.allclose(np.dot(rotation_part, rotation_part.T), np.eye(3), atol=1e-6)
 
 
 # A matrix
@@ -226,6 +230,12 @@ def forward_kinematics(DH):
     for i in range(n_DoF):
         A = A_matrix(*DH[i,:])
         T = torch.matmul(T, A)
+
+
+        if not is_orthogonal(A):
+            print(f"Warning: Transformation matrix for joint {i+1} is not orthogonal.")
+        else:
+            print(f"Valid: Transformation matrix for joint {i+1} is orthogonal.")
     
     return T
 
