@@ -629,7 +629,7 @@ if __name__ == '__main__':
 
     inference_results_all = []
 
-    for r in robot_list:
+    for r in robot_list_test:
 
         robot_choice = r
         X_test = train_test_val_all[r]["X_test"]
