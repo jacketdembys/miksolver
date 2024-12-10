@@ -233,9 +233,9 @@ def forward_kinematics(DH):
 
 
         if not is_orthogonal(A):
-            print(f"Warning: Transformation matrix for joint {i+1} is not orthogonal.")
+            print(f"Warning: Transformation matrix from joint 0 to joint {i+1} is not orthogonal.")
         else:
-            print(f"Valid: Transformation matrix for joint {i+1} is orthogonal.")
+            print(f"Valid: Transformation matrix from joint 0 to joint {i+1} is orthogonal.")
     
     return T
 
@@ -878,6 +878,114 @@ def load_all_dataset(data, n_DoF, batch_size, robot_choice, dataset_type, device
 
     #print("Here")
    
+
+    print("==> Shape X_train: ", X_train.shape)
+    print("==> Shape y_train: ", y_train.shape)
+
+    print("==> Shape X_validate: ", X_validate.shape)
+    print("==> Shape y_validate: ", y_validate.shape)
+
+    print("==> Shape X_test: ", X_test.shape)
+    print("==> Shape y_test: ", y_test.shape)
+
+    train_data = LoadIKDataset(X_train, y_train, device)
+    test_data = LoadIKDataset(X_validate, y_validate, device)
+
+    train_data_loader = DataLoader(dataset=train_data,
+                                   batch_size=batch_size,
+                                   shuffle=True,
+                                   drop_last=True,
+                                   pin_memory=False,
+                                   num_workers=8,
+                                   persistent_workers=True)
+
+    test_data_loader = DataLoader(dataset=test_data,
+                                   batch_size=batch_size,
+                                   drop_last=False,
+                                   shuffle=False,
+                                   pin_memory=False,
+                                   num_workers=8,
+                                   persistent_workers=True)
+
+    return train_data_loader, test_data_loader, train_test_val_all, sc_in
+
+
+
+
+# function to load the dataset
+def load_all_dataset_2(data, n_DoF, batch_size, robot_choice, dataset_type, device, input_dim, robot_list, robot_list_test):
+
+
+    X_train, y_train = [], []
+    X_test, y_test = [], []
+    X_validate, y_validate = [], []
+
+    train_test_val_all = {}
+
+    for i in range(len(robot_list)):
+        if dataset_type == "combine-6DoF" or dataset_type == "combine-7DoF"  or dataset_type == "combine-up-to-7DoF":
+
+            if robot_list[i] in robot_list_test:
+                
+                print("\n==> Sequence dataset for {}... (test set)".format(robot_list[i]))
+
+                # get the input
+                X = data[:,:input_dim,i]
+
+                # get the output
+                y = data[:,input_dim:,i]
+
+                X_test.append(X)
+                y_test.append(y)
+
+                train_test_val_all[robot_list[i]] = {"X_test": np.array(X),
+                                                    "y_test": np.array(y)}
+            else: 
+                print("\n==> Sequence dataset for {}... (train set)".format(robot_list[i]))
+                # get the input
+                X = data[:,:input_dim,i]
+
+                # get the output
+                y = data[:,input_dim:,i]
+
+                # get the train and validate sets
+                X_train_each, X_validate_each, y_train_each, y_validate_each = train_test_split(X, 
+                                                                                                y, 
+                                                                                                test_size = 0.1,
+                                                                                                random_state = 1)
+                
+                X_train.append(X_train_each)
+                y_train.append(y_train_each)
+
+                X_validate.append(X_validate_each)
+                y_validate.append(y_validate_each)
+            
+
+
+
+    # convert lists to arrays
+    X_train, y_train = np.array(X_train), np.array(y_train)
+    X_test, y_test = np.array(X_test), np.array(y_test)
+    X_validate, y_validate = np.array(X_validate), np.array(y_validate)
+
+
+    X_train = np.reshape(X_train, newshape=(X_train.shape[0]*X_train.shape[1], X_train.shape[2]) , order="F")
+    X_validate = np.reshape(X_validate, newshape=(X_validate.shape[0]*X_validate.shape[1], X_validate.shape[2]) , order="F")
+    X_test = np.reshape(X_test, newshape=(X_test.shape[0]*X_test.shape[1], X_test.shape[2]) , order="F")
+   
+    y_train = np.reshape(y_train, newshape=(y_train.shape[0]*y_train.shape[1], y_train.shape[2]) , order="F")
+    y_validate = np.reshape(y_validate, newshape=(y_validate.shape[0]*y_validate.shape[1], y_validate.shape[2]) , order="F")
+    y_test = np.reshape(y_test, newshape=(y_test.shape[0]*y_test.shape[1], y_test.shape[2]) , order="F")
+
+
+
+    sc_in = MinMaxScaler(copy=True, feature_range=(0, 1))
+    sc_out = MinMaxScaler(copy=True, feature_range=(0, 1))
+    
+    X_train = sc_in.fit_transform(X_train)
+    X_validate = sc_in.transform(X_validate) 
+    X_test = sc_in.transform(X_test) 
+
 
     print("==> Shape X_train: ", X_train.shape)
     print("==> Shape y_train: ", y_train.shape)
