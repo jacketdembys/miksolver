@@ -62,7 +62,7 @@ load_option = args.load
 num_blocks = args.blocks
 joint_variation = args.jvar
 seed_choice = args.seed
-robot_choice = 'All-6DoF'   #'7DoF-7R-Panda' '7DoF-GP66' 'All-6DoF' 'All-7DoF'
+robot_choice = 'All-7DoF'   #'7DoF-7R-Panda' '7DoF-GP66' 'All-6DoF' 'All-7DoF'
 
 # read from path script
 #for joint_variation in range(1,2):
@@ -89,7 +89,7 @@ config_info = {
             'NUM_SAMPLES': 10000,
             'JOINT_LIMIT_SCALE': int(scale),
             'JOINT_VARIATION': int(joint_variation),
-            'TYPE':'combine-6DoF', # 1_to_1, seq, combine-6DoF, combine-7DoF, combine-up-to-7DoF
+            'TYPE':'combine-7DoF', # 1_to_1, seq, combine-6DoF, combine-7DoF, combine-up-to-7DoF
             'ORIENTATION': 'RPY' # RPY, Quaternion, DualQuaternion, Rotation, Rotation6d
         },
         'CHECKPOINT': {
@@ -100,7 +100,7 @@ config_info = {
         },
         'HYPERPARAMETERS': {
             'EPOCHS': 1000,
-            'BATCH_SIZE': 32, #100000
+            'BATCH_SIZE': 128, #100000
             'SHUFFLE': True,
             'NUM_WORKERS': 4,
             'PIN_MEMORY': False,
