@@ -86,7 +86,7 @@ config_info = {
     },             
     'TRAIN': {
         'DATASET': {
-            'NUM_SAMPLES': 10000,
+            'NUM_SAMPLES': 100000,
             'JOINT_LIMIT_SCALE': int(scale),
             'JOINT_VARIATION': int(joint_variation),
             'TYPE':'combine-up-to-7DoF', # 1_to_1, seq, combine-6DoF, combine-7DoF, combine-up-to-7DoF
