@@ -234,8 +234,8 @@ def forward_kinematics(DH):
 
         if not is_orthogonal(A):
             print(f"Warning: Transformation matrix from joint 0 to joint {i+1} is not orthogonal.")
-        else:
-            print(f"Valid: Transformation matrix from joint 0 to joint {i+1} is orthogonal.")
+        #else:
+        #    print(f"Valid: Transformation matrix from joint 0 to joint {i+1} is orthogonal.")
     
     return T
 
