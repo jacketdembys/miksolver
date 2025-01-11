@@ -607,6 +607,7 @@ if __name__ == '__main__':
     best_valid_loss = float('inf')
     start_time_train = time.monotonic()
     start_time = time.monotonic()
+    counter = 0
 
     for epoch in range(EPOCHS):        
         
