@@ -2217,6 +2217,7 @@ def evaluate(model, iterator, criterion, criterion_type, device, epoch, EPOCHS):
                 #x = input_mapping(x,B)
                 
                 y_pred, _ = model(x)
+                y_pred = torch.nan_to_num(y_pred, nan=0.0)
                 loss = criterion(y_pred, y)
 
                 
