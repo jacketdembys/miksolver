@@ -1628,6 +1628,7 @@ def train(model, iterator, optimizer, criterion, criterion_type, batch_size, dev
             print("y: ", torch.isnan(y).any())
             print("y_pred: ", torch.isnan(y_pred).any())
             print("loss: ", torch.isnan(loss).any())
+            print(loss)
             print("\n")
 
             if torch.isnan(loss).any():
