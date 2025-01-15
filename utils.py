@@ -1603,6 +1603,7 @@ def load_test_all_dataset(X_test, y_test, device, sc_in):
 # train function
 def train(model, iterator, optimizer, criterion, criterion_type, batch_size, device, epoch, EPOCHS, scheduler, scaler):
     epoch_loss = 0
+    count = 0
     model.train()    
     #print("... FKloss Minimization ...")
    
@@ -1626,6 +1627,11 @@ def train(model, iterator, optimizer, criterion, criterion_type, batch_size, dev
             print("y_pred: ", torch.isnan(y_pred).any())
             print("loss: ", torch.isnan(loss).any())
             print("\n")
+
+            if torch.isnan(loss).any():
+                count += 1
+                if count == 5:
+                    break
             
 
 
