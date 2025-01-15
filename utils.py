@@ -1620,10 +1620,15 @@ def train(model, iterator, optimizer, criterion, criterion_type, batch_size, dev
             y_pred, _ = model(x)
             loss = criterion(y_pred, y)
 
+            print("Epoch: ", epoch_time)
             print("x: ", x)
             print("y: ", y)
             print("y_pred: ", y_pred)
+            print("loss: ", loss)
+            print("\n")
             
+
+
             if criterion_type == "ld":
                 criterion_2 = nn.MSELoss(reduction="mean")
                 loss_2 = criterion_2(y_pred, y)
