@@ -1620,6 +1620,7 @@ def train(model, iterator, optimizer, criterion, criterion_type, batch_size, dev
  
             
             y_pred, _ = model(x)
+            y_pred = torch.nan_to_num(y_pred, nan=0.0)
             loss = criterion(y_pred, y)
 
             print("Epoch ->: ", epoch)
