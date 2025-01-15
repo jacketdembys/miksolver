@@ -1604,6 +1604,7 @@ def load_test_all_dataset(X_test, y_test, device, sc_in):
 def train(model, iterator, optimizer, criterion, criterion_type, batch_size, device, epoch, EPOCHS, scheduler, scaler):
     epoch_loss = 0
     count = 0
+    count_batch = 0
     model.train()    
     #print("... FKloss Minimization ...")
    
@@ -1662,7 +1663,10 @@ def train(model, iterator, optimizer, criterion, criterion_type, batch_size, dev
             
             
             #print("Here")
-            #sys.exit()     
+            #sys.exit()   
+            # 
+            count_batch += 1
+            print("Current batch: ", count_batch)  
 
     return epoch_loss/len(iterator)
 
