@@ -2415,14 +2415,15 @@ def inference_modified_all(model, iterator, criterion, device, robot_choice):
         #x = input_mapping(x,B)
         
         y_pred, _ = model(x)
+        y_pred = torch.nan_to_num(y_pred, nan=0.0)
 
         if '6DoF' in robot_choice:
             y_preds.append(y_pred[:,:6].detach().cpu().numpy().squeeze())
             y_desireds.append(y[:,:6].detach().cpu().numpy().squeeze())
 
         elif '7DoF' in robot_choice:
-            y_preds.append(y_pred.detach().cpu().numpy().squeeze())
-            y_desireds.append(y.detach().cpu().numpy().squeeze())
+            y_preds.append(y_pred[:,:7].detach().cpu().numpy().squeeze())
+            y_desireds.append(y[:,:7].detach().cpu().numpy().squeeze())
 
         #X_desireds.append(x.detach().cpu().numpy().squeeze())
 
