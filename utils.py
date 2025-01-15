@@ -1621,10 +1621,10 @@ def train(model, iterator, optimizer, criterion, criterion_type, batch_size, dev
             loss = criterion(y_pred, y)
 
             print("Epoch: ", epoch_time)
-            print("x: ", x)
-            print("y: ", y)
-            print("y_pred: ", y_pred)
-            print("loss: ", loss)
+            print("x: ", torch.isnan(x).any())
+            print("y: ", torch.isnan(y).any())
+            print("y_pred: ", torch.isnan(y_pred).any())
+            print("loss: ", torch.isnan(loss).any())
             print("\n")
             
 
