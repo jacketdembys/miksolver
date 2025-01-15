@@ -1621,7 +1621,7 @@ def train(model, iterator, optimizer, criterion, criterion_type, batch_size, dev
             y_pred, _ = model(x)
             loss = criterion(y_pred, y)
 
-            print("Epoch: ", epoch_time)
+            print("Epoch ->: ", epoch)
             print("x: ", torch.isnan(x).any())
             print("y: ", torch.isnan(y).any())
             print("y_pred: ", torch.isnan(y_pred).any())
