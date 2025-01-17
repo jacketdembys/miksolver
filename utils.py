@@ -1623,6 +1623,7 @@ def train(model, iterator, optimizer, criterion, criterion_type, batch_size, dev
             y_pred = torch.nan_to_num(y_pred, nan=0.0)
             loss = criterion(y_pred, y)
 
+            """
             print("Epoch ->: ", epoch)
             print("x: ", torch.isnan(x).any())
             print("y: ", torch.isnan(y).any())
@@ -1630,6 +1631,7 @@ def train(model, iterator, optimizer, criterion, criterion_type, batch_size, dev
             print("loss: ", torch.isnan(loss).any())
             print(loss)
             print("\n")
+            """
 
             if torch.isnan(loss).any():
                 count += 1
