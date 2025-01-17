@@ -1670,7 +1670,7 @@ def train(model, iterator, optimizer, criterion, criterion_type, batch_size, dev
             #sys.exit()   
             # 
             count_batch += 1
-            print("Current batch: ", count_batch)  
+            #print("Current batch: ", count_batch)  
 
     return epoch_loss/len(iterator)
 
