@@ -17,6 +17,7 @@ class ResidualBlockSum(nn.Module):
         self.fc1 = nn.Linear(input_dim, output_dim)
         self.bn1 = nn.BatchNorm1d(output_dim)
         self.relu = nn.ReLU(inplace=True)
+        self.gelu = nn.GELU()
 
         self.fc2 = nn.Linear(output_dim, output_dim)
         self.bn2 = nn.BatchNorm1d(output_dim)
@@ -35,12 +36,12 @@ class ResidualBlockSum(nn.Module):
 
         out = self.fc1(x)
         out = self.bn1(out)
-        out = self.relu(out)
+        out = self.gelu(out)
         out = self.bn2(out)
         out = self.fc2(out)
 
         out += residual
-        out = self.relu(out)
+        out = self.gelu(out)
 
         #print("DEBUG: block output shape = {}\n".format(out.shape))
 
