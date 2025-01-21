@@ -39,6 +39,8 @@ class GPT2ForRegression(nn.Module):
         # Add positional embeddings
         position_ids = torch.arange(0, seq_len, device=x.device).unsqueeze(0)  # Shape: (1, input_dim)
         position_embeddings = self.position_embedding(position_ids)  # Shape: (1, input_dim, embed_dim)
+        print(x.shape)
+        print(position_embeddings.shape)
         x = x + position_embeddings  # Shape: (batch_size, input_dim, embed_dim)
         
         # Pass through Transformer blocks
