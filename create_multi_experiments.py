@@ -105,7 +105,7 @@ config_info = {
             'NUM_WORKERS': 4,
             'PIN_MEMORY': False,
             'PERSISTENT_WORKERS': True,
-            'OPTIMIZER_NAME': 'Adam', # Adam, SGD
+            'OPTIMIZER_NAME': 'AdamW', # Adam, SGD
             'LEARNING_RATE': 1e-3, #0.0001, # MLP / RMLP -> 0.001 and DMLP -> 0.0001
             'BETAS': [0.9, 0.999],
             'EPS': 0.00001,

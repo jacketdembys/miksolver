@@ -390,7 +390,7 @@ if __name__ == '__main__':
     elif optimizer_choice == "Adam":
         optimizer = optim.Adam(model.parameters(), lr=learning_rate)
     elif optimizer_choice == "AdamW":
-        optimizer = optim.AdamW(model.parameters(), lr=learning_rate)
+        optimizer = optim.AdamW(model.parameters(), lr=learning_rate, weight_decay=1e-2)
     elif optimizer_choice == "Adadelta":
         optimizer = optim.Adadelta(model.parameters())
     elif optimizer_choice == "RMSprop":
