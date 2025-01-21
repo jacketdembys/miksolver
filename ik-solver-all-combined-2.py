@@ -366,7 +366,7 @@ if __name__ == '__main__':
     elif network_type == "Transformer":
         embed_dim = 128
         num_head = 10
-        num_layers = layers
+        num_layers = num_blocks
         model = GPT2ForRegression(input_dim=input_dim, output_dim=output_dim, embed_dim=embed_dim, num_heads=num_head, num_layers=num_layers, ff_dim=hidden_layer_sizes[0])
         save_layers_str = "embed_dim_"+ str(embed_dim)+"_heads_"+ str(num_head)+"_layers_"+ str(num_layers)
     
@@ -627,7 +627,7 @@ if __name__ == '__main__':
     elif network_type == "Transformer":
         embed_dim = 128
         num_head = 10
-        num_layers = layers
+        num_layers = num_blocks  # The number of transformer blocks
         model = GPT2ForRegression(input_dim=input_dim, output_dim=output_dim, embed_dim=embed_dim, num_heads=num_head, num_layers=num_layers, ff_dim=hidden_layer_sizes[0]).to(device)
         
 
