@@ -28,6 +28,7 @@ from sklearn import manifold
 from tqdm import tqdm
 from scipy import stats
 #from torchviz import make_dot
+from transformers import get_scheduler
 from utils import *
 from models import *
 from models_2 import DenseNet
@@ -466,8 +467,12 @@ if __name__ == '__main__':
     # Training and Validation
     ############################################################################################################## 
     scaler = torch.cuda.amp.GradScaler()
-    scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(optimizer, mode='min', factor=0.1, patience=10, threshold=0.0001, threshold_mode='rel', cooldown=0, min_lr=0, eps=1e-08, verbose=True)
+    #scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(optimizer, mode='min', factor=0.1, patience=10, threshold=0.0001, threshold_mode='rel', cooldown=0, min_lr=0, eps=1e-08, verbose=True)
     #scheduler = torch.optim.lr_scheduler.OneCycleLR(optimizer, max_lr=learning_rate, steps_per_epoch=len(train_data_loader), epochs=EPOCHS)  
+    total_steps = EPOCHS*int(len(train_data_loader)/batch_size)
+    scheduler = get_scheduler(
+        "cosine", optimizer=optimizer, num_warmup_steps=100, num_training_steps=total_steps
+    )
     #patience = 0.1*EPOCHS
     patience = 20
     train_losses = []
@@ -625,8 +630,8 @@ if __name__ == '__main__':
         block_config = block_config.squeeze(0).astype(int).tolist()
         model = DenseNet(input_dim, neurons, block_config, output_dim).to(device)
     elif network_type == "Transformer":
-        embed_dim = 768
-        num_head = 12
+        #embed_dim = 256
+        #num_head = 12
         num_layers = num_blocks  # The number of transformer blocks
         model = GPT2ForRegression(input_dim=input_dim, output_dim=output_dim, embed_dim=embed_dim, num_heads=num_head, num_layers=num_layers, ff_dim=hidden_layer_sizes[0]).to(device)
         
