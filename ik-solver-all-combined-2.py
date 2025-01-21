@@ -364,8 +364,8 @@ if __name__ == '__main__':
         model = FourierMLP(input_dim, fourier_dim, hidden_layer_sizes, output_dim, scale)
 
     elif network_type == "Transformer":
-        embed_dim = 768
-        num_head = 12
+        embed_dim = 256
+        num_head = 8
         num_layers = num_blocks
         model = GPT2ForRegression(input_dim=input_dim, output_dim=output_dim, embed_dim=embed_dim, num_heads=num_head, num_layers=num_layers, ff_dim=hidden_layer_sizes[0])
         save_layers_str = "embed_dim_"+ str(embed_dim)+"_heads_"+ str(num_head)+"_layers_"+ str(num_layers)
