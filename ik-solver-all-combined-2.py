@@ -491,7 +491,8 @@ if __name__ == '__main__':
         #print(valid_loss)
         #sys.exit()
 
-        scheduler.step(valid_loss)
+        #scheduler.step(valid_loss)
+        scheduler.step()
 
         train_losses.append(train_loss)
         valid_losses.append(valid_loss)
