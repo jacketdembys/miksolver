@@ -48,10 +48,11 @@ class GPT2ForRegression(nn.Module):
             x = layer(x)  # Shape: (batch_size, input_dim, embed_dim)
         
         # Take the first token's representation for regression (e.g., x[:, 0, :])
-        x = x.mean(dim=1)  # Aggregate embeddings across features
+        #print(x.shape)
+        #x = x.mean(dim=1)  # Aggregate embeddings across features
         
         # Final regression output
-        print(x.shape)
+        ##print(x.shape)
         output = self.output_layer(x)  # Shape: (batch_size, output_dim)
         return output
 

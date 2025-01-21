@@ -62,7 +62,7 @@ load_option = args.load
 num_blocks = args.blocks
 joint_variation = args.jvar
 seed_choice = args.seed
-robot_choice = '3-to-10DoF'   #'7DoF-7R-Panda' '7DoF-GP66' 'All-6DoF' 'All-7DoF'
+robot_choice = 'All-6DoF'   #'7DoF-7R-Panda' '7DoF-GP66' 'All-6DoF' 'All-7DoF' 'All-DoFs' '3-to-10DoF'
 
 # read from path script
 #for joint_variation in range(1,2):
@@ -79,7 +79,7 @@ config_info = {
     'SEED_NUMBER': int(seed_choice),
     'DEVICE_ID': int(gpu_id),
     'MODEL': {
-        'NAME': 'ResMLP',      # MLP, ResMLP, DenseMLP3, DenseMLP 
+        'NAME': 'Transformer',      # MLP, ResMLP, DenseMLP3, DenseMLP 
         'NUM_HIDDEN_LAYERS': layers,          
         'NUM_HIDDEN_NEURONS': neurons,
         'NUM_BLOCKS': num_blocks
@@ -89,7 +89,7 @@ config_info = {
             'NUM_SAMPLES': 25000,
             'JOINT_LIMIT_SCALE': int(scale),
             'JOINT_VARIATION': int(joint_variation),
-            'TYPE':'combine-up-to-10DoF', # 1_to_1, seq, combine-6DoF, combine-7DoF, combine-up-to-7DoF, combine-up-to-10DoF
+            'TYPE':'combine-6DoF', # 1_to_1, seq, combine-6DoF, combine-7DoF, combine-up-to-7DoF, combine-up-to-10DoF
             'ORIENTATION': 'RPY' # RPY, Quaternion, DualQuaternion, Rotation, Rotation6d
         },
         'CHECKPOINT': {

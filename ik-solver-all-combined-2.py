@@ -31,6 +31,7 @@ from scipy import stats
 from utils import *
 from models import *
 from models_2 import DenseNet
+from model_transformer import *
 
 
 if __name__ == '__main__':
@@ -361,6 +362,9 @@ if __name__ == '__main__':
         fourier_dim = 16
         scale = 10
         model = FourierMLP(input_dim, fourier_dim, hidden_layer_sizes, output_dim, scale)
+
+    elif network_type == "Transformer":
+        model = GPT2ForRegression(input_dim=input_dim, output_dim=output_dim, embed_dim=128, num_heads=4, num_layers=3, ff_dim=hidden_layer_sizes[0])
         
     
     if init_type == "uniform":
@@ -617,7 +621,9 @@ if __name__ == '__main__':
         block_config[:,:] = layers
         block_config = block_config.squeeze(0).astype(int).tolist()
         model = DenseNet(input_dim, neurons, block_config, output_dim).to(device)
-
+    elif network_type == "Transformer":
+        model = GPT2ForRegression(input_dim=input_dim, output_dim=output_dim, embed_dim=128, num_heads=4, num_layers=3, ff_dim=hidden_layer_sizes[0])
+        
 
     state_dict = model.state_dict()
     for n, p in torch.load(weights_file, map_location=lambda storage, loc: storage).items():
