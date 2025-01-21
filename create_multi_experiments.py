@@ -86,7 +86,7 @@ config_info = {
     },             
     'TRAIN': {
         'DATASET': {
-            'NUM_SAMPLES': 25000,
+            'NUM_SAMPLES': 100000,
             'JOINT_LIMIT_SCALE': int(scale),
             'JOINT_VARIATION': int(joint_variation),
             'TYPE':'combine-6DoF', # 1_to_1, seq, combine-6DoF, combine-7DoF, combine-up-to-7DoF, combine-up-to-10DoF
@@ -100,7 +100,7 @@ config_info = {
         },
         'HYPERPARAMETERS': {
             'EPOCHS': 1000,
-            'BATCH_SIZE': 1024, #128, #100000
+            'BATCH_SIZE': 128, #128, #100000
             'SHUFFLE': True,
             'NUM_WORKERS': 4,
             'PIN_MEMORY': False,
