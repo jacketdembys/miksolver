@@ -14,7 +14,7 @@ class GPT2ForRegression(nn.Module):
         self.input_embedding = nn.Linear(input_dim, embed_dim)
         
         # Positional embeddings
-        self.position_embedding = nn.Embedding(input_dim, embed_dim)
+        #self.position_embedding = nn.Embedding(input_dim, embed_dim)
         
         # Transformer blocks
         self.layers = nn.ModuleList([
@@ -37,11 +37,11 @@ class GPT2ForRegression(nn.Module):
         x = self.input_embedding(x)  # Shape: (batch_size, input_dim, embed_dim)
         
         # Add positional embeddings
-        position_ids = torch.arange(0, seq_len, device=x.device).unsqueeze(0)  # Shape: (1, input_dim)
-        position_embeddings = self.position_embedding(position_ids)  # Shape: (1, input_dim, embed_dim)
-        print(x.shape)
-        print(position_embeddings.shape)
-        x = x + position_embeddings  # Shape: (batch_size, input_dim, embed_dim)
+        #position_ids = torch.arange(0, seq_len, device=x.device).unsqueeze(0)  # Shape: (1, input_dim)
+        #position_embeddings = self.position_embedding(position_ids)  # Shape: (1, input_dim, embed_dim)
+        #print(x.shape)
+        #print(position_embeddings.shape)
+        #x = x + position_embeddings  # Shape: (batch_size, input_dim, embed_dim)
         
         # Pass through Transformer blocks
         for layer in self.layers:
@@ -96,12 +96,7 @@ class TransformerBlock(nn.Module):
 if __name__ == "__main__":
 
     print("\n\n")
-    print("Testing DenseNet MLP")
-    input_dim = 6
-    hidden_size = 128
-    output_dim = 7
-    num_blocks = 5
-
+    print("Testing Transformer Architecture")
 
     # Define model
     model = GPT2ForRegression(input_dim=22, output_dim=10, embed_dim=128, num_heads=4, num_layers=3, ff_dim=256)
