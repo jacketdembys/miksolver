@@ -54,7 +54,7 @@ class GPT2ForRegression(nn.Module):
         # Final regression output
         ##print(x.shape)
         output = self.output_layer(x)  # Shape: (batch_size, output_dim)
-        return output
+        return output, output
 
 
 class TransformerBlock(nn.Module):
