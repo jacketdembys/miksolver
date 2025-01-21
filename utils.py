@@ -1647,7 +1647,11 @@ def train(model, iterator, optimizer, criterion, criterion_type, batch_size, dev
             
 
             loss.backward()
-            #torch.nn.utils.clip_grad_norm_(model.parameters(), 10)
+            
+            # Gradient clipping
+            max_norm = 1.0  # Set the maximum gradient norm
+            torch.nn.utils.clip_grad_norm_(model.parameters(), max_norm)
+
             optimizer.step()
             #scheduler.step()           
            

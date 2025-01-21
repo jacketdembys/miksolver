@@ -8,7 +8,7 @@ class GPT2ForRegression(nn.Module):
         super(GPT2ForRegression, self).__init__()
         
         # Name the model
-        self.name = "Transformer [in{}, emb{}, nhead{}, nlayer, ffdim, out{}]".format(str(input_dim), str(embed_dim), str(num_heads), str(num_layers), str(ff_dim), str(output_dim))
+        self.name = "Transformer [in{}, emb{}, nhead{}, nlayer{}, ffdim{}, out{}]".format(str(input_dim), str(embed_dim), str(num_heads), str(num_layers), str(ff_dim), str(output_dim))
          
         # Embedding for input features
         self.input_embedding = nn.Linear(input_dim, embed_dim)
