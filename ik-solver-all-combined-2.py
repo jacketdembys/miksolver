@@ -365,8 +365,8 @@ if __name__ == '__main__':
 
     elif network_type == "Transformer":
         embed_dim = 128
-        num_head = 4
-        num_layers = 3
+        num_head = 10
+        num_layers = layers
         model = GPT2ForRegression(input_dim=input_dim, output_dim=output_dim, embed_dim=embed_dim, num_heads=num_head, num_layers=num_layers, ff_dim=hidden_layer_sizes[0])
         save_layers_str = "embed_dim_"+ str(embed_dim)+"_heads_"+ str(num_head)+"_layers_"+ str(num_layers)
     
@@ -469,7 +469,7 @@ if __name__ == '__main__':
     scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(optimizer, mode='min', factor=0.1, patience=10, threshold=0.0001, threshold_mode='rel', cooldown=0, min_lr=0, eps=1e-08, verbose=True)
     #scheduler = torch.optim.lr_scheduler.OneCycleLR(optimizer, max_lr=learning_rate, steps_per_epoch=len(train_data_loader), epochs=EPOCHS)  
     #patience = 0.1*EPOCHS
-    patience = 100
+    patience = 20
     train_losses = []
     valid_losses = []
     all_losses = []
@@ -625,8 +625,12 @@ if __name__ == '__main__':
         block_config = block_config.squeeze(0).astype(int).tolist()
         model = DenseNet(input_dim, neurons, block_config, output_dim).to(device)
     elif network_type == "Transformer":
-        model = GPT2ForRegression(input_dim=input_dim, output_dim=output_dim, embed_dim=128, num_heads=4, num_layers=3, ff_dim=hidden_layer_sizes[0])
+        embed_dim = 128
+        num_head = 10
+        num_layers = layers
+        model = GPT2ForRegression(input_dim=input_dim, output_dim=output_dim, embed_dim=embed_dim, num_heads=num_head, num_layers=num_layers, ff_dim=hidden_layer_sizes[0]).to(device)
         
+
 
     state_dict = model.state_dict()
     for n, p in torch.load(weights_file, map_location=lambda storage, loc: storage).items():
