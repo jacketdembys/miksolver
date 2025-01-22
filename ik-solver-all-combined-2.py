@@ -470,7 +470,7 @@ if __name__ == '__main__':
     scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(optimizer, mode='min', factor=0.1, patience=10, threshold=0.0001, threshold_mode='rel', cooldown=0, min_lr=0, eps=1e-08, verbose=True)
     #scheduler = torch.optim.lr_scheduler.OneCycleLR(optimizer, max_lr=learning_rate, steps_per_epoch=len(train_data_loader), epochs=EPOCHS)  
     print("Total training samples: ", len(train_data_loader)) 
-    total_steps = EPOCHS*int(len(train_data_loader)/batch_size)
+    total_steps = EPOCHS*int(len(train_data_loader))
     #scheduler = get_scheduler(
     #    "cosine", optimizer=optimizer, num_warmup_steps=100, num_training_steps=total_steps
     #)

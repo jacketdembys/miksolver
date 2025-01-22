@@ -2,6 +2,7 @@ import math
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
+from utils import *
 
 
 ####################################################
@@ -538,20 +539,21 @@ class DenseMLP2(nn.Module):
 
 if __name__ == '__main__':
 
-    """
+    
     print("Testing ResNet MLP (sum)")
-    input_dim = 6
-    hidden_size = 128
-    output_dim = 7
-    num_blocks = 10
+    input_dim = 18
+    hidden_size = 1024
+    output_dim = 6
+    num_blocks = 2
     model = ResMLPSum(input_dim, hidden_size, output_dim, num_blocks)
     print(model.name)
     print(model)
+    print("==> Trainable parameters: {}".format(count_parameters(model)))
 
-    input = torch.randn(3,6)
+    input = torch.randn(3,18)
     output, _ = model(input)
     print(output.size())
-    """
+    
     
     """
     print()
@@ -570,7 +572,7 @@ if __name__ == '__main__':
     """
 
 
-    
+    """
     print("\n\n")
     print("Testing DenseNet MLP")
     input_dim = 6
@@ -584,5 +586,6 @@ if __name__ == '__main__':
     input = torch.randn(3,6)
     output, _ = model(input)
     print(output.size())
+    """
     
     

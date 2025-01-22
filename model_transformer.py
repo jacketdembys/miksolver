@@ -1,6 +1,6 @@
 import torch
 import torch.nn as nn
-
+from utils import *
 
 
 class GPT2ForRegression(nn.Module):
@@ -102,6 +102,8 @@ if __name__ == "__main__":
 
     # Define model
     model = GPT2ForRegression(input_dim=22, output_dim=10, embed_dim=128, num_heads=4, num_layers=3, ff_dim=256)
+
+    print("==> Trainable parameters: {}".format(count_parameters(model)))
 
     # Create a dummy input: (batch_size=16, input_dim=22)
     inputs = torch.rand(16, 22)
