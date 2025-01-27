@@ -11,10 +11,10 @@ class GPT2ForRegression(nn.Module):
         self.name = "Transformer [in{}, emb{}, nhead{}, nlayer{}, ffdim{}, out{}]".format(str(input_dim), str(embed_dim), str(num_heads), str(num_layers), str(ff_dim), str(output_dim))
          
         # Embedding for input features
-        self.input_embedding = nn.Linear(input_dim, embed_dim)
+        self.input_embedding = nn.Linear(1, embed_dim)
         
         # Positional embeddings
-        #self.position_embedding = nn.Embedding(input_dim, embed_dim)
+        self.position_embedding = nn.Embedding(input_dim, embed_dim)
         
         # Transformer blocks
         self.layers = nn.ModuleList([
@@ -34,23 +34,27 @@ class GPT2ForRegression(nn.Module):
         batch_size, seq_len = x.size()  # seq_len = input_dim
         
         # Project inputs to embedding space
+        x = x.unsqueeze(-1)
         x = self.input_embedding(x)  # Shape: (batch_size, input_dim, embed_dim)
         
+
         # Add positional embeddings
-        #position_ids = torch.arange(0, seq_len, device=x.device).unsqueeze(0)  # Shape: (1, input_dim)
-        #position_embeddings = self.position_embedding(position_ids)  # Shape: (1, input_dim, embed_dim)
+        position_ids = torch.arange(seq_len, device=x.device).unsqueeze(0)  # Shape: (1, input_dim)
+        position_embeddings = self.position_embedding(position_ids)  # Shape: (1, input_dim, embed_dim)
+              
+        
         #print(x.shape)
         #print(position_embeddings.shape)
-        #x = x + position_embeddings  # Shape: (batch_size, input_dim, embed_dim)
+        x = x + position_embeddings  # Shape: (batch_size, input_dim, embed_dim)
         
+
         # Pass through Transformer blocks
         for layer in self.layers:
             x = layer(x)  # Shape: (batch_size, input_dim, embed_dim)
         
         # Take the first token's representation for regression (e.g., x[:, 0, :])
-        #print(x.shape)
-        #x = x.mean(dim=1)  # Aggregate embeddings across features
-        
+        x = x.mean(dim=1)  # Aggregate embeddings across features
+                
         # Final regression output
         ##print(x.shape)
         output = self.output_layer(x)  # Shape: (batch_size, output_dim)
@@ -109,7 +113,7 @@ if __name__ == "__main__":
     inputs = torch.rand(16, 22)
 
     # Forward pass
-    outputs = model(inputs)  # Shape: (16, 10)
+    outputs, _ = model(inputs)  # Shape: (16, 10)
 
     print("Model input shape:", inputs.shape)
     print("Model output shape:", outputs.shape)
