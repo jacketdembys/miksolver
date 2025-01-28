@@ -4,7 +4,12 @@ from utils import *
 
 
 class GPT2ForRegression(nn.Module):
-    def __init__(self, input_dim=22, output_dim=10, embed_dim=128, num_heads=4, num_layers=3, ff_dim=256):
+    def __init__(self, input_dim=22, 
+                 output_dim=10, 
+                 embed_dim=128, 
+                 num_heads=4, 
+                 num_layers=3, 
+                 ff_dim=256):
         super(GPT2ForRegression, self).__init__()
         
         # Name the model

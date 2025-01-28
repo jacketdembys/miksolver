@@ -32,7 +32,9 @@ from transformers import get_scheduler
 from utils import *
 from models import *
 from models_2 import DenseNet
-from model_transformer import *
+from model_gpt2 import *
+from model_gpt3 import *
+
 
 
 if __name__ == '__main__':
@@ -364,12 +366,24 @@ if __name__ == '__main__':
         scale = 10
         model = FourierMLP(input_dim, fourier_dim, hidden_layer_sizes, output_dim, scale)
 
-    elif network_type == "Transformer":
+    elif network_type == "GPT2":
         embed_dim = 768
         num_head = 12
         num_layers = num_blocks
         model = GPT2ForRegression(input_dim=input_dim, output_dim=output_dim, embed_dim=embed_dim, num_heads=num_head, num_layers=num_layers, ff_dim=hidden_layer_sizes[0])
         save_layers_str = "embed_dim_"+ str(embed_dim)+"_heads_"+ str(num_head)+"_layers_"+ str(num_layers)
+    
+    elif network_type == "GPT3":
+        embed_dim = 768
+        num_head = 12
+        num_layers = num_blocks
+        model = GPT3ForRegression(input_dim=input_dim, output_dim=output_dim, embed_dim=embed_dim, num_heads=num_head, num_layers=num_layers, ff_dim=hidden_layer_sizes[0])
+        save_layers_str = "embed_dim_"+ str(embed_dim)+"_heads_"+ str(num_head)+"_layers_"+ str(num_layers)
+    
+    
+    
+    
+    
     
     if init_type == "uniform":
         model.apply(weights_init_uniform_rule)
@@ -631,12 +645,19 @@ if __name__ == '__main__':
         block_config[:,:] = layers
         block_config = block_config.squeeze(0).astype(int).tolist()
         model = DenseNet(input_dim, neurons, block_config, output_dim).to(device)
-    elif network_type == "Transformer":
+    elif network_type == "GPT2":
         #embed_dim = 256
         #num_head = 12
         num_layers = num_blocks  # The number of transformer blocks
         model = GPT2ForRegression(input_dim=input_dim, output_dim=output_dim, embed_dim=embed_dim, num_heads=num_head, num_layers=num_layers, ff_dim=hidden_layer_sizes[0]).to(device)
-        
+    elif network_type == "GPT3":
+        #embed_dim = 768
+        #num_head = 12
+        num_layers = num_blocks
+        model = GPT3ForRegression(input_dim=input_dim, output_dim=output_dim, embed_dim=embed_dim, num_heads=num_head, num_layers=num_layers, ff_dim=hidden_layer_sizes[0]).to(device)
+        save_layers_str = "embed_dim_"+ str(embed_dim)+"_heads_"+ str(num_head)+"_layers_"+ str(num_layers)
+    
+    
 
 
     state_dict = model.state_dict()
