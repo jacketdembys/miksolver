@@ -71,11 +71,11 @@ class GPT3ForRegression(nn.Module):
         x = self.token_embedding(x)                             # (batch_size, seq_len, embed_dim)
 
         # Create position ids [0..seq_len-1]
-        position_ids = torch.arange(seq_len, device=device).unsqueeze(0)  # shape (1, seq_len)
-        pos_emb = self.position_embedding(position_ids)                  # shape (1, seq_len, embed_dim)
+        #position_ids = torch.arange(seq_len, device=device).unsqueeze(0)  # shape (1, seq_len)
+        #pos_emb = self.position_embedding(position_ids)                  # shape (1, seq_len, embed_dim)
         
         # Add position embeddings
-        x = x + pos_emb  # shape (batch_size, seq_len, embed_dim)
+        #x = x + pos_emb  # shape (batch_size, seq_len, embed_dim)
         x = self.dropout(x)
 
         # Causal mask: prevents a token from attending to future tokens
