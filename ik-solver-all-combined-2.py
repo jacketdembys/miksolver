@@ -332,34 +332,28 @@ if __name__ == '__main__':
     
     # get network architecture
     if network_type == "MLP":
-
         model = MLP(input_dim, hidden_layer_sizes, output_dim)
         save_layers_str = "blocks_"+ str(num_blocks)+"_layers_"+ str(layers)
         #model = MLP(mapping_size*2, hidden_layer_sizes, output_dim)
 
     elif network_type == "ResMLP":
-
         model = ResMLPSum(input_dim, neurons, output_dim, num_blocks)
         save_layers_str = "blocks_"+ str(num_blocks)+"_layers_"+ str(layers)
 
     elif network_type == "DenseMLP":
-
         model = DenseMLP(input_dim, neurons, output_dim, num_blocks)
         save_layers_str = "blocks_"+ str(num_blocks)+"_layers_"+ str(layers)
 
     elif network_type == "DenseMLP2":
-
         model = DenseMLP2(input_dim, neurons, output_dim, num_blocks)
         save_layers_str = "blocks_"+ str(num_blocks)+"_layers_"+ str(layers)
 
     elif network_type == "DenseMLP3":
-
         block_config = np.zeros((1,num_blocks))   
         block_config[:,:] = layers
         block_config = block_config.squeeze(0).astype(int).tolist()
         model = DenseNet(input_dim, neurons, block_config, output_dim)
         save_layers_str = "blocks_"+ str(num_blocks)+"_layers_"+ str(layers)
-
 
     elif network_type == "FourierMLP":
         fourier_dim = 16
@@ -655,8 +649,7 @@ if __name__ == '__main__':
         #num_head = 12
         num_layers = num_blocks
         model = GPT3ForRegression(input_dim=input_dim, output_dim=output_dim, embed_dim=embed_dim, num_heads=num_head, num_layers=num_layers, ff_dim=hidden_layer_sizes[0]).to(device)
-        save_layers_str = "embed_dim_"+ str(embed_dim)+"_heads_"+ str(num_head)+"_layers_"+ str(num_layers)
-    
+       
     
 
 
