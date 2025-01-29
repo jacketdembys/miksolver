@@ -44,13 +44,13 @@ class GPT2ForRegression(nn.Module):
         
 
         # Add positional embeddings
-        position_ids = torch.arange(seq_len, device=x.device).unsqueeze(0)  # Shape: (1, input_dim)
-        position_embeddings = self.position_embedding(position_ids)  # Shape: (1, input_dim, embed_dim)
+        #position_ids = torch.arange(seq_len, device=x.device).unsqueeze(0)  # Shape: (1, input_dim)
+        #position_embeddings = self.position_embedding(position_ids)  # Shape: (1, input_dim, embed_dim)
               
         
         #print(x.shape)
         #print(position_embeddings.shape)
-        x = x + position_embeddings  # Shape: (batch_size, input_dim, embed_dim)
+        #x = x + position_embeddings  # Shape: (batch_size, input_dim, embed_dim)
         
 
         # Pass through Transformer blocks
@@ -93,12 +93,14 @@ class TransformerBlock(nn.Module):
         """
         # Self-attention with residual connection
         attention_output, _ = self.attention(x, x, x)  # (batch_size, seq_len, embed_dim)
-        x = x + self.dropout(attention_output)
+        #x = x + self.dropout(attention_output)
+        x = x + attention_output
         x = self.layer_norm_1(x)
         
         # Feedforward with residual connection
         ff_output = self.feed_forward(x)  # (batch_size, seq_len, embed_dim)
-        x = x + self.dropout(ff_output)
+        #x = x + self.dropout(ff_output)
+        x = x + ff_output
         x = self.layer_norm_2(x)
         
         return x
