@@ -79,7 +79,7 @@ config_info = {
     'SEED_NUMBER': int(seed_choice),
     'DEVICE_ID': int(gpu_id),
     'MODEL': {
-        'NAME': 'GPT3',      # MLP, ResMLP, DenseMLP3, DenseMLP 
+        'NAME': 'GPT2',      # MLP, ResMLP, DenseMLP3, DenseMLP 
         'NUM_HIDDEN_LAYERS': layers,          
         'NUM_HIDDEN_NEURONS': neurons,
         'NUM_BLOCKS': num_blocks
