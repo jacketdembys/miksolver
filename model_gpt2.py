@@ -96,14 +96,14 @@ class TransformerBlock(nn.Module):
         """
         # Self-attention with residual connection
         attention_output, _ = self.attention(x, x, x)  # (batch_size, seq_len, embed_dim)
-        x = x + self.dropout(attention_output)
-        #x = x + attention_output
+        #x = x + self.dropout(attention_output)
+        x = x + attention_output
         x = self.layer_norm_1(x)
         
         # Feedforward with residual connection
         ff_output = self.feed_forward(x)  # (batch_size, seq_len, embed_dim)
-        x = x + self.dropout(ff_output)
-        #x = x + ff_output
+        #x = x + self.dropout(ff_output)
+        x = x + ff_output
         x = self.layer_norm_2(x)
         
         return x

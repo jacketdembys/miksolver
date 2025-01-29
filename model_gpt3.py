@@ -39,7 +39,8 @@ class GPT3ForRegression(nn.Module):
         )
 
         # Each of the 22 input features is a scalar to be embedded into an 'embed_dim' vector
-        self.token_embedding = nn.Linear(1, embed_dim)
+        #self.token_embedding = nn.Linear(1, embed_dim)
+        self.token_embedding = nn.Linear(input_dim, embed_dim)
 
         # Positional embeddings (GPT-3 also uses learnable embeddings)
         self.position_embedding = nn.Embedding(max_seq_len, embed_dim)
@@ -67,9 +68,10 @@ class GPT3ForRegression(nn.Module):
         device = x.device
 
         # Reshape to [batch_size, seq_len, 1] so we can embed each scalar "token"
-        x = x.unsqueeze(-1)                                     # (batch_size, seq_len, 1)
+        #x = x.unsqueeze(-1)                                     # (batch_size, seq_len, 1)
+        print(x.shape)
         x = self.token_embedding(x)                             # (batch_size, seq_len, embed_dim)
-
+        print(x.shape)
         # Create position ids [0..seq_len-1]
         #position_ids = torch.arange(seq_len, device=device).unsqueeze(0)  # shape (1, seq_len)
         #pos_emb = self.position_embedding(position_ids)                  # shape (1, seq_len, embed_dim)
@@ -77,10 +79,12 @@ class GPT3ForRegression(nn.Module):
         # Add position embeddings
         #x = x + pos_emb  # shape (batch_size, seq_len, embed_dim)
         x = self.dropout(x)
+        print(x.shape)
 
         # Causal mask: prevents a token from attending to future tokens
         # In many regression tasks you might not need a causal mask, but we include it for GPT-3–style.
         attn_mask = causal_mask(seq_len, device=device)
+        print(attn_mask.shape)
 
         # Pass through GPT-3–style decoder blocks
         for layer in self.layers:
@@ -88,7 +92,7 @@ class GPT3ForRegression(nn.Module):
 
         # Aggregate across sequence -> single vector per batch
         # We use mean pooling here; you could also use x[:,0,:] if you want a 'first token' representation
-        x = x.mean(dim=1)  # (batch_size, embed_dim)
+        #x = x.mean(dim=1)  # (batch_size, embed_dim)
 
         # Final regression output
         out = self.output_layer(x)  # (batch_size, output_dim)
