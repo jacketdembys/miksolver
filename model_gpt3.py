@@ -43,7 +43,7 @@ class GPT3ForRegression(nn.Module):
         self.token_embedding = nn.Linear(input_dim, embed_dim)
 
         # Positional embeddings (GPT-3 also uses learnable embeddings)
-        self.position_embedding = nn.Embedding(max_seq_len, embed_dim)
+        self.position_embedding = nn.Embedding(input_dim, embed_dim)
 
         # Transformer blocks
         self.layers = nn.ModuleList([
@@ -69,22 +69,23 @@ class GPT3ForRegression(nn.Module):
 
         # Reshape to [batch_size, seq_len, 1] so we can embed each scalar "token"
         #x = x.unsqueeze(-1)                                     # (batch_size, seq_len, 1)
-        print(x.shape)
+        #print(x.shape)
         x = self.token_embedding(x)                             # (batch_size, seq_len, embed_dim)
-        print(x.shape)
+        #print(x.shape)
         # Create position ids [0..seq_len-1]
         #position_ids = torch.arange(seq_len, device=device).unsqueeze(0)  # shape (1, seq_len)
         #pos_emb = self.position_embedding(position_ids)                  # shape (1, seq_len, embed_dim)
         
         # Add position embeddings
         #x = x + pos_emb  # shape (batch_size, seq_len, embed_dim)
-        x = self.dropout(x)
-        print(x.shape)
+        #x = self.dropout(x)
+        #print(x.shape)
 
         # Causal mask: prevents a token from attending to future tokens
         # In many regression tasks you might not need a causal mask, but we include it for GPT-3–style.
-        attn_mask = causal_mask(seq_len, device=device)
-        print(attn_mask.shape)
+        #attn_mask = causal_mask(seq_len, device=device)
+        attn_mask = None
+        #print(attn_mask.shape)
 
         # Pass through GPT-3–style decoder blocks
         for layer in self.layers:
@@ -133,14 +134,16 @@ class GPT3Block(nn.Module):
         # 2) Self-attention
         attn_output, _ = self.attn(normed_x, normed_x, normed_x, attn_mask=attn_mask)
         # 3) Residual connection
-        x = x + self.dropout(attn_output)
+        #x = x + self.dropout(attn_output)
+        x = x + attn_output
         
         # 4) Another layer norm
         normed_x = self.ln2(x)
         # 5) Feedforward
         ff_out = self.mlp(normed_x)
         # 6) Residual connection
-        x = x + self.dropout(ff_out)
+        #x = x + self.dropout(ff_out)
+        x = x + ff_out
 
         return x
 
