@@ -457,8 +457,8 @@ if __name__ == '__main__':
     if save_option == "cloud":
         run = wandb.init(
             entity="jacketdembys",
-            project = "ik-steps",                
-            group = "IJCNN_25_"+network_type+"_"+"Combined_Dataset_"+str(dataset_samples)+"_Scale_"+str(int(scale))+"_"+dataset_type+"_"+loss_choice,  # "_seq", "_1_to_1"
+            project = "ik-steps-2",                
+            group = "IROS_25_"+network_type+"_"+"Combined_Dataset_"+str(dataset_samples)+"_Scale_"+str(int(scale))+"_"+dataset_type+"_"+loss_choice,  # "_seq", "_1_to_1"
             #group = "Dataset_Scale_"+str(int(scale)),
             name = network_type+"_"+robot_choice+"_" \
                     + save_layers_str + "_neurons_" + str(neurons) + "_batch_" + str(batch_size) +"_" \
@@ -728,6 +728,7 @@ if __name__ == '__main__':
                 "joints_scale": joint_steps,
                 "architecture": model.name,
                 "network": network_type,
+                "parameters": count_parameters(model),
                 "layers": layers,
                 "neurons": neurons,
                 "optimizer": optimizer_choice,
