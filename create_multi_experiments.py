@@ -66,7 +66,15 @@ load_option = args.load
 num_blocks = args.blocks
 joint_variation = args.jvar
 seed_choice = args.seed
-model = args.model
+model_str = args.model
+if model_str == "resmlp":
+    model = "ResMLP" 
+elif model_str == "gpt2":
+    model = "GPT2"
+elif model_str == "gpt3":
+    model = "GPT3"
+
+
 robot_choice = 'All-6DoF'   #'7DoF-7R-Panda' '7DoF-GP66' 'All-6DoF' 'All-7DoF' 'All-DoFs' '3-to-10DoF'
 
 # read from path script
