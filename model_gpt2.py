@@ -79,7 +79,8 @@ class TransformerBlock(nn.Module):
         # Feedforward Neural Network
         self.feed_forward = nn.Sequential(
             nn.Linear(embed_dim, ff_dim),
-            nn.GELU(),
+            #nn.GELU(),
+            nn.ReLU(),
             nn.Linear(ff_dim, embed_dim)
         )
         
