@@ -43,6 +43,10 @@ parser.add_argument("--seed",
                     type=int,
                     default=1,
                     help="seed choice.")
+parser.add_argument("--model",
+                    type=str,
+                    required=True,
+                    help="model to run.")
 
 
 if not len(sys.argv) > 1:
@@ -62,6 +66,7 @@ load_option = args.load
 num_blocks = args.blocks
 joint_variation = args.jvar
 seed_choice = args.seed
+model = args.model
 robot_choice = 'All-6DoF'   #'7DoF-7R-Panda' '7DoF-GP66' 'All-6DoF' 'All-7DoF' 'All-DoFs' '3-to-10DoF'
 
 # read from path script
@@ -79,7 +84,7 @@ config_info = {
     'SEED_NUMBER': int(seed_choice),
     'DEVICE_ID': int(gpu_id),
     'MODEL': {
-        'NAME': 'ResMLP',      # MLP, ResMLP, DenseMLP3, DenseMLP, GPT2, GPT3
+        'NAME': model,      # MLP, ResMLP, DenseMLP3, DenseMLP, GPT2, GPT3
         'NUM_HIDDEN_LAYERS': layers,          
         'NUM_HIDDEN_NEURONS': neurons,
         'NUM_BLOCKS': num_blocks
@@ -100,7 +105,7 @@ config_info = {
         },
         'HYPERPARAMETERS': {
             'EPOCHS': 1000,
-            'BATCH_SIZE': 32, #128, #100000
+            'BATCH_SIZE': 128, #128, #100000
             'SHUFFLE': True,
             'NUM_WORKERS': 4,
             'PIN_MEMORY': False,
