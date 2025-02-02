@@ -116,8 +116,8 @@ class GPT3Block(nn.Module):
         self.ln2 = nn.LayerNorm(embed_dim)
         self.mlp = nn.Sequential(
             nn.Linear(embed_dim, ff_dim),
-            #nn.GELU(),
-            nn.ReLU(),
+            nn.GELU(),
+            #nn.ReLU(),
             nn.Linear(ff_dim, embed_dim),
         )
         
