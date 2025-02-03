@@ -113,13 +113,13 @@ config_info = {
         },
         'HYPERPARAMETERS': {
             'EPOCHS': 1000,
-            'BATCH_SIZE': 32, #128, #100000
+            'BATCH_SIZE': 128, #128, #100000
             'SHUFFLE': True,
             'NUM_WORKERS': 4,
             'PIN_MEMORY': False,
             'PERSISTENT_WORKERS': True,
             'OPTIMIZER_NAME': 'AdamW', # Adam, SGD
-            'LEARNING_RATE': 1e-4, #0.0001, # MLP / RMLP -> 0.001 and DMLP -> 0.0001
+            'LEARNING_RATE': 1e-5, #0.0001, # MLP / RMLP -> 0.001 and DMLP -> 0.0001
             'BETAS': [0.9, 0.999],
             'EPS': 0.00001,
             'WEIGHT_DECAY': 0.0,
