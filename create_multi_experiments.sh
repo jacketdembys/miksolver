@@ -15,6 +15,8 @@
 python ik-solver-all-combined-2.py --config-path train_seed_1.yaml &
 python ik-solver-all-combined-2.py --config-path train_seed_2.yaml &
 python ik-solver-all-combined-2.py --config-path train_seed_3.yaml &
+python ik-solver-all-combined-2.py --config-path train_seed_4.yaml &
+python ik-solver-all-combined-2.py --config-path train_seed_5.yaml &
 #python ik-solver.py --config-path train_4.yaml &
 #python ik-solver.py --config-path train_5.yaml &
 wait
