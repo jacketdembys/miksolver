@@ -65,7 +65,7 @@ scale = args.scale # 2 - 10
 load_option = args.load
 num_blocks = args.blocks
 joint_variation = args.jvar
-seed_choice = args.seed
+#seed_choice = args.seed
 model_str = args.model
 
 if model_str == "resmlp":
@@ -87,7 +87,7 @@ robot_choice = 'All-6DoF'   #'7DoF-7R-Panda' '7DoF-GP66' 'All-6DoF' 'All-7DoF' '
 #for scale in range(2,12,2):
 neuron = 1024
 #for neuron in range(128, neurons+128, 128):
-for sr in range(3):
+for sr in range(args.seed):
 
     seed_choice = sr+1
     # batch sizes: 4096, 65536
