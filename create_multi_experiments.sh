@@ -12,9 +12,9 @@
 #for script in $`scripts`; do
 #    python ik-solver.py --config-path "$script" &
 #done
-python ik-solver-all-combined.py --config-path train_1.yaml &
-#python ik-solver.py --config-path train_2.yaml &
-#python ik-solver.py --config-path train_18.yaml &
+python ik-solver-all-combined-2.py --config-path train_seed_1.yaml &
+python ik-solver-all-combined-2.py --config-path train_seed_2.yaml &
+python ik-solver-all-combined-2.py --config-path train_seed_3.yaml &
 #python ik-solver.py --config-path train_4.yaml &
 #python ik-solver.py --config-path train_5.yaml &
 wait

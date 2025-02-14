@@ -415,6 +415,11 @@ if __name__ == '__main__':
         criterion = nn.L1Loss(reduction="mean")
     elif loss_choice == "ld":
         criterion = FKLoss(robot_choice=robot_choice, device=device)
+    elif loss_choice == "lik":
+        num_joints = 7  # Change this dynamically
+        min_limits = torch.full((num_joints,), -3.14, dtype=torch.float32)
+        max_limits = torch.full((num_joints,), 3.14, dtype=torch.float32)
+        criterion = InverseKinematicsLoss(min_limits=min_limits, max_limits=max_limits)
     
     
 
@@ -483,7 +488,7 @@ if __name__ == '__main__':
     #    "cosine", optimizer=optimizer, num_warmup_steps=100, num_training_steps=total_steps
     #)
     #patience = 0.1*EPOCHS
-    patience = 10
+    patience = 20
     train_losses = []
     valid_losses = []
     all_losses = []

@@ -1020,6 +1020,113 @@ def load_all_dataset_2(data, n_DoF, batch_size, robot_choice, dataset_type, devi
 
 
 
+# function to load the dataset
+def load_all_dataset_2_newloss(data, n_DoF, batch_size, robot_choice, dataset_type, device, input_dim, robot_list, robot_list_test):
+
+
+    X_train, y_train = [], []
+    X_test, y_test = [], []
+    X_validate, y_validate = [], []
+
+    train_test_val_all = {}
+
+    for i in range(len(robot_list)):
+        if dataset_type == "combine-6DoF" or dataset_type == "combine-7DoF"  or dataset_type == "combine-up-to-7DoF":
+
+            if robot_list[i] in robot_list_test:
+                
+                print("\n==> Sequence dataset for {}... (test set)".format(robot_list[i]))
+
+                # get the input
+                X = data[:,:input_dim,i]
+
+                # get the output
+                y = data[:,input_dim:,i]
+
+                X_test.append(X)
+                y_test.append(y)
+
+                train_test_val_all[robot_list[i]] = {"X_test": np.array(X),
+                                                    "y_test": np.array(y)}
+            else: 
+                print("\n==> Sequence dataset for {}... (train set)".format(robot_list[i]))
+                # get the input
+                X = data[:,:input_dim,i]
+
+                # get the output
+                y = data[:,input_dim:,i]
+
+                # get the train and validate sets
+                X_train_each, X_validate_each, y_train_each, y_validate_each = train_test_split(X, 
+                                                                                                y, 
+                                                                                                test_size = 0.1,
+                                                                                                random_state = 1)
+                
+                X_train.append(X_train_each)
+                y_train.append(y_train_each)
+
+                X_validate.append(X_validate_each)
+                y_validate.append(y_validate_each)
+            
+
+
+
+    # convert lists to arrays
+    X_train, y_train = np.array(X_train), np.array(y_train)
+    X_test, y_test = np.array(X_test), np.array(y_test)
+    X_validate, y_validate = np.array(X_validate), np.array(y_validate)
+
+
+    X_train = np.reshape(X_train, newshape=(X_train.shape[0]*X_train.shape[1], X_train.shape[2]) , order="F")
+    X_validate = np.reshape(X_validate, newshape=(X_validate.shape[0]*X_validate.shape[1], X_validate.shape[2]) , order="F")
+    X_test = np.reshape(X_test, newshape=(X_test.shape[0]*X_test.shape[1], X_test.shape[2]) , order="F")
+   
+    y_train = np.reshape(y_train, newshape=(y_train.shape[0]*y_train.shape[1], y_train.shape[2]) , order="F")
+    y_validate = np.reshape(y_validate, newshape=(y_validate.shape[0]*y_validate.shape[1], y_validate.shape[2]) , order="F")
+    y_test = np.reshape(y_test, newshape=(y_test.shape[0]*y_test.shape[1], y_test.shape[2]) , order="F")
+
+
+
+    sc_in = MinMaxScaler(copy=True, feature_range=(0, 1))
+    sc_out = MinMaxScaler(copy=True, feature_range=(0, 1))
+    
+    X_train = sc_in.fit_transform(X_train)
+    X_validate = sc_in.transform(X_validate) 
+    X_test = sc_in.transform(X_test) 
+
+
+    print("==> Shape X_train: ", X_train.shape)
+    print("==> Shape y_train: ", y_train.shape)
+
+    print("==> Shape X_validate: ", X_validate.shape)
+    print("==> Shape y_validate: ", y_validate.shape)
+
+    print("==> Shape X_test: ", X_test.shape)
+    print("==> Shape y_test: ", y_test.shape)
+
+    train_data = LoadIKDataset(X_train, y_train, device)
+    test_data = LoadIKDataset(X_validate, y_validate, device)
+
+    train_data_loader = DataLoader(dataset=train_data,
+                                   batch_size=batch_size,
+                                   shuffle=True,
+                                   drop_last=True,
+                                   pin_memory=False,
+                                   num_workers=8,
+                                   persistent_workers=True)
+
+    test_data_loader = DataLoader(dataset=test_data,
+                                   batch_size=batch_size,
+                                   drop_last=False,
+                                   shuffle=False,
+                                   pin_memory=False,
+                                   num_workers=8,
+                                   persistent_workers=True)
+
+    return train_data_loader, test_data_loader, train_test_val_all, sc_in
+
+
+
 
 # function to load the dataset
 def load_all_dataset_3(data_train, data_test, n_DoF, batch_size, robot_choice, dataset_type, device, input_dim, robot_list, robot_list_test):
@@ -3536,3 +3643,121 @@ class FKLossB(nn.Module):
         loss = self.criterion(joints_fk, poses)
         #print(loss)
         return loss
+
+
+
+
+#################################################
+# Custom Loss for IROS 2025
+#################################################
+# Position Loss Component
+class PositionLoss(nn.Module):
+    def __init__(self, beta=1.0):
+        super(PositionLoss, self).__init__()
+        self.smooth_l1 = nn.SmoothL1Loss(beta=beta)
+
+    def forward(self, p_pred, p_true):
+        return self.smooth_l1(p_pred, p_true)
+    
+
+# Rotation Loss Component
+class RotationLoss(nn.Module):
+    def __init__(self, beta=1.0):
+        super(RotationLoss, self).__init__()
+        self.smooth_l1 = nn.SmoothL1Loss(beta=beta)
+
+    def forward(self, q_pred, q_true):
+        loss_q = self.smooth_l1(q_pred, q_true)
+        loss_neg_q = self.smooth_l1(q_pred, -q_true)
+        return torch.min(loss_q, loss_neg_q)  # Take the minimum loss
+    
+
+# Joint Limit Loss
+class JointLimitLoss(nn.Module):
+    def __init__(self, min_limits, max_limits):
+        super(JointLimitLoss, self).__init__()
+        self.min_limits = torch.tensor(min_limits, dtype=torch.float32)
+        self.max_limits = torch.tensor(max_limits, dtype=torch.float32)
+
+    def forward(self, joint_angles):
+        lower_violation = torch.relu(self.min_limits - joint_angles)  # If below min, add penalty
+        upper_violation = torch.relu(joint_angles - self.max_limits)  # If above max, add penalty
+        return torch.mean(lower_violation + upper_violation)  # Penalize joint limit violations
+
+
+# Smoothness Loss
+class SmoothnessLoss(nn.Module):
+    def __init__(self):
+        super(SmoothnessLoss, self).__init__()
+
+    def forward(self, joint_angles, prev_joint_angles):
+        return torch.mean(torch.abs(joint_angles - prev_joint_angles))  # Penalize sudden changes
+
+# Singularity Loss
+class SingularityLoss(nn.Module):
+    def __init__(self):
+        super(SingularityLoss, self).__init__()
+
+    def forward(self, jacobian):
+        det = torch.det(jacobian)
+        return torch.mean(1.0 / (det + 1e-6))  # Penalize near-zero determinant
+
+
+# Combined Inverse Kinematics Loss with Learnable weights
+class InverseKinematicsLoss(nn.Module):
+    def __init__(self, dh_params, min_limits, max_limits):
+        super(InverseKinematicsLoss, self).__init__()
+
+        # Learnable weights
+        self.w_pos = nn.Parameter(torch.tensor(1.0).log())
+        self.w_rot = nn.Parameter(torch.tensor(1.0).log())
+        self.w_joint = nn.Parameter(torch.tensor(1.0).log())
+        self.w_smooth = nn.Parameter(torch.tensor(1.0).log())
+        self.w_sing = nn.Parameter(torch.tensor(1.0).log())
+
+        # Loss functions
+        self.position_loss = PositionLoss()
+        self.rotation_loss = RotationLoss()
+        self.joint_limit_loss = JointLimitLoss(min_limits, max_limits)
+        self.smoothness_loss = SmoothnessLoss()
+        self.singularity_loss = SingularityLoss()
+
+    def forward(self, joint_angles_pred, prev_joint_angles, p_true, q_true, jacobian):
+        """
+        Computes the full IK loss function.
+
+        Args:
+            joint_angles_pred (torch.Tensor): Predicted joint angles (N, num_joints)
+            prev_joint_angles (torch.Tensor): Previous joint angles (N, num_joints)
+            p_true (torch.Tensor): Target positions (N, 3)
+            q_true (torch.Tensor): Target quaternions (N, 4)
+            jacobian (torch.Tensor): Jacobian matrix (N, 6, num_joints)
+
+        Returns:
+            torch.Tensor: Combined loss.
+        """
+        # Compute FK to get predicted pose
+        p_pred, q_pred = forward_kinematics(joint_angles_pred, dh_params)
+
+        # Compute losses
+        l_pos = self.position_loss(p_pred, p_true)
+        l_rot = self.rotation_loss(q_pred, q_true)
+        l_joint = self.joint_limit_loss(joint_angles_pred)
+        l_smooth = self.smoothness_loss(joint_angles_pred, prev_joint_angles)
+        l_sing = self.singularity_loss(jacobian)
+
+        # Convert learnable weights
+        w_pos = torch.exp(self.w_pos)
+        w_rot = torch.exp(self.w_rot)
+        w_joint = torch.exp(self.w_joint)
+        w_smooth = torch.exp(self.w_smooth)
+        w_sing = torch.exp(self.w_sing)
+
+        # Compute total loss
+        total_loss = (w_pos * l_pos 
+                      + w_rot * l_rot 
+                      + w_joint * l_joint 
+                      + w_smooth * l_smooth 
+                      + w_sing * l_sing)
+
+        return total_loss
