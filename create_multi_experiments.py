@@ -47,6 +47,10 @@ parser.add_argument("--model",
                     type=str,
                     required=True,
                     help="model to run.")
+parser.add_argument("--dataset",
+                    type=str,
+                    required=True,
+                    help="dataset to run.")
 
 
 if not len(sys.argv) > 1:
@@ -79,8 +83,15 @@ elif model_str == "gpt2":
 elif model_str == "gpt3":
     model = "GPT3"
 
-
-robot_choice = 'All-7DoF'   #'7DoF-7R-Panda' '7DoF-GP66' 'All-6DoF' 'All-7DoF' 'All-DoFs' '3-to-10DoF'
+if arg.dataset == "all6":
+    robot_choice = 'All-6DoF'   #'7DoF-7R-Panda' '7DoF-GP66' 'All-6DoF' 'All-7DoF' 'All-DoFs' '3-to-10DoF'
+    data_choice = 'combine-6DoF'
+if arg.dataset == "all7":
+    robot_choice = 'All-7DoF'   #'7DoF-7R-Panda' '7DoF-GP66' 'All-6DoF' 'All-7DoF' 'All-DoFs' '3-to-10DoF'
+    data_choice = 'combine-7DoF'
+if arg.dataset == "all67":
+    robot_choice = 'All-DoFs'   #'7DoF-7R-Panda' '7DoF-GP66' 'All-6DoF' 'All-7DoF' 'All-DoFs' '3-to-10DoF'
+    data_choice = 'combine-up-to-7DoF'
 
 # read from path script
 #for joint_variation in range(1,2):
@@ -110,7 +121,7 @@ for sr in range(args.seed):
                 'NUM_SAMPLES': 100000,
                 'JOINT_LIMIT_SCALE': int(scale),
                 'JOINT_VARIATION': int(joint_variation),
-                'TYPE':'combine-6DoF', # 1_to_1, seq, combine-6DoF, combine-7DoF, combine-up-to-7DoF, combine-up-to-10DoF
+                'TYPE': data_choice, # 1_to_1, seq, combine-6DoF, combine-7DoF, combine-up-to-7DoF, combine-up-to-10DoF
                 'ORIENTATION': 'RPY' # RPY, Quaternion, DualQuaternion, Rotation, Rotation6d
             },
             'CHECKPOINT': {
