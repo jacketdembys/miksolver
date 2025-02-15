@@ -85,7 +85,7 @@ robot_choice = 'All-6DoF'   #'7DoF-7R-Panda' '7DoF-GP66' 'All-6DoF' 'All-7DoF' '
 # read from path script
 #for joint_variation in range(1,2):
 #for scale in range(2,12,2):
-neuron = 1024
+#neuron = 1024
 #for neuron in range(128, neurons+128, 128):
 #for sr in range(args.seed):
 #seed_choice = sr+1
