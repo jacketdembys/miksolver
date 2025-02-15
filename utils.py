@@ -895,16 +895,16 @@ def load_all_dataset(data, n_DoF, batch_size, robot_choice, dataset_type, device
                                    batch_size=batch_size,
                                    shuffle=True,
                                    drop_last=True,
-                                   pin_memory=False,
-                                   num_workers=8,
+                                   pin_memory=True,
+                                   num_workers=2,
                                    persistent_workers=True)
 
     test_data_loader = DataLoader(dataset=test_data,
                                    batch_size=batch_size,
                                    drop_last=False,
                                    shuffle=False,
-                                   pin_memory=False,
-                                   num_workers=8,
+                                   pin_memory=True,
+                                   num_workers=2,
                                    persistent_workers=True)
 
     return train_data_loader, test_data_loader, train_test_val_all, sc_in
@@ -1003,16 +1003,16 @@ def load_all_dataset_2(data, n_DoF, batch_size, robot_choice, dataset_type, devi
                                    batch_size=batch_size,
                                    shuffle=True,
                                    drop_last=True,
-                                   pin_memory=False,
-                                   num_workers=8,
+                                   pin_memory=True,
+                                   num_workers=2,
                                    persistent_workers=True)
 
     test_data_loader = DataLoader(dataset=test_data,
                                    batch_size=batch_size,
                                    drop_last=False,
                                    shuffle=False,
-                                   pin_memory=False,
-                                   num_workers=8,
+                                   pin_memory=True,
+                                   num_workers=2,
                                    persistent_workers=True)
 
     return train_data_loader, test_data_loader, train_test_val_all, sc_in
@@ -1112,7 +1112,7 @@ def load_all_dataset_2_newloss(data, n_DoF, batch_size, robot_choice, dataset_ty
                                    shuffle=True,
                                    drop_last=True,
                                    pin_memory=False,
-                                   num_workers=8,
+                                   num_workers=2,
                                    persistent_workers=True)
 
     test_data_loader = DataLoader(dataset=test_data,
@@ -1120,7 +1120,7 @@ def load_all_dataset_2_newloss(data, n_DoF, batch_size, robot_choice, dataset_ty
                                    drop_last=False,
                                    shuffle=False,
                                    pin_memory=False,
-                                   num_workers=8,
+                                   num_workers=2,
                                    persistent_workers=True)
 
     return train_data_loader, test_data_loader, train_test_val_all, sc_in
@@ -1223,7 +1223,7 @@ def load_all_dataset_3(data_train, data_test, n_DoF, batch_size, robot_choice, d
                                    shuffle=True,
                                    drop_last=True,
                                    pin_memory=False,
-                                   num_workers=8,
+                                   num_workers=2,
                                    persistent_workers=True)
 
     test_data_loader = DataLoader(dataset=test_data,
@@ -1231,7 +1231,7 @@ def load_all_dataset_3(data_train, data_test, n_DoF, batch_size, robot_choice, d
                                    drop_last=False,
                                    shuffle=False,
                                    pin_memory=False,
-                                   num_workers=8,
+                                   num_workers=2,
                                    persistent_workers=True)
 
     return train_data_loader, test_data_loader, train_test_val_all, sc_in
