@@ -482,8 +482,8 @@ if __name__ == '__main__':
     #scheduler = get_scheduler(
     #    "cosine", optimizer=optimizer, num_warmup_steps=100, num_training_steps=total_steps
     #)
-    #patience = 0.1*EPOCHS
-    patience = 10
+    patience = 0.1*EPOCHS
+    #patience = 10
     train_losses = []
     valid_losses = []
     all_losses = []
