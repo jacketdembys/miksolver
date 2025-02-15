@@ -80,7 +80,7 @@ elif model_str == "gpt3":
     model = "GPT3"
 
 
-robot_choice = 'All-6DoF'   #'7DoF-7R-Panda' '7DoF-GP66' 'All-6DoF' 'All-7DoF' 'All-DoFs' '3-to-10DoF'
+robot_choice = 'All-7DoF'   #'7DoF-7R-Panda' '7DoF-GP66' 'All-6DoF' 'All-7DoF' 'All-DoFs' '3-to-10DoF'
 
 # read from path script
 #for joint_variation in range(1,2):
@@ -88,7 +88,7 @@ robot_choice = 'All-6DoF'   #'7DoF-7R-Panda' '7DoF-GP66' 'All-6DoF' 'All-7DoF' '
 #neuron = 1024
 #for neuron in range(128, neurons+128, 128):
 for sr in range(args.seed):
-    
+
     seed_choice = sr+1
 
     # batch sizes: 4096, 65536
