@@ -116,12 +116,12 @@ if __name__ == "__main__":
     print("Testing Transformer Architecture")
 
     # Define model
-    model = GPT2ForRegression(input_dim=22, output_dim=10, embed_dim=128, num_heads=4, num_layers=3, ff_dim=256)
+    model = GPT2ForRegression(input_dim=18, output_dim=6, embed_dim=768, num_heads=12, num_layers=2, ff_dim=1024)
 
     print("==> Trainable parameters: {}".format(count_parameters(model)))
 
     # Create a dummy input: (batch_size=16, input_dim=22)
-    inputs = torch.rand(16, 22)
+    inputs = torch.rand(16, 18)
 
     # Forward pass
     outputs, _ = model(inputs)  # Shape: (16, 10)
