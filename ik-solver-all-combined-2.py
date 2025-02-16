@@ -121,7 +121,7 @@ if __name__ == '__main__':
         pose_header = ["x", "y", "z","R","P","Y"]
         joint_header = ["t1", "t2", "t3", "t4", "t5", "t6", "t7"]
 
-    elif robot_choice == "All":
+    elif robot_choice == "All-67DoF":
         if dataset_type == "combine-up-to-7DoF":
             n_DoF = 7
             input_dim = 6+7+6
