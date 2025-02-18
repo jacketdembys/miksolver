@@ -1004,7 +1004,7 @@ def load_all_dataset_2(data, n_DoF, batch_size, robot_choice, dataset_type, devi
                                    shuffle=True,
                                    drop_last=True,
                                    pin_memory=True,
-                                   num_workers=2,
+                                   num_workers=50,
                                    persistent_workers=True)
 
     test_data_loader = DataLoader(dataset=test_data,
@@ -1012,7 +1012,7 @@ def load_all_dataset_2(data, n_DoF, batch_size, robot_choice, dataset_type, devi
                                    drop_last=False,
                                    shuffle=False,
                                    pin_memory=True,
-                                   num_workers=2,
+                                   num_workers=50,
                                    persistent_workers=True)
 
     return train_data_loader, test_data_loader, train_test_val_all, sc_in
