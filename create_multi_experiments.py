@@ -118,7 +118,7 @@ for sr in range(args.seed):
         },             
         'TRAIN': {
             'DATASET': {
-                'NUM_SAMPLES': 1000000,
+                'NUM_SAMPLES': 100000,
                 'JOINT_LIMIT_SCALE': int(scale),
                 'JOINT_VARIATION': int(joint_variation),
                 'TYPE': data_choice, # 1_to_1, seq, combine-6DoF, combine-7DoF, combine-up-to-7DoF, combine-up-to-10DoF
@@ -132,13 +132,13 @@ for sr in range(args.seed):
             },
             'HYPERPARAMETERS': {
                 'EPOCHS': 1000,
-                'BATCH_SIZE': 100000, #128, #100000
+                'BATCH_SIZE': 128, #128, #100000
                 'SHUFFLE': True,
                 'NUM_WORKERS': 4,
                 'PIN_MEMORY': False,
                 'PERSISTENT_WORKERS': True,
                 'OPTIMIZER_NAME': 'Adam', # Adam, SGD
-                'LEARNING_RATE': 1e-3, #0.0001, # MLP / RMLP -> 0.001 and DMLP -> 0.0001
+                'LEARNING_RATE': 1e-4, #0.0001, # MLP / RMLP -> 0.001 and DMLP -> 0.0001
                 'BETAS': [0.9, 0.999],
                 'EPS': 0.00001,
                 'WEIGHT_DECAY': 0.0,
