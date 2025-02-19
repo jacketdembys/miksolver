@@ -4,25 +4,33 @@ clc, clear, close all
 %% Add path to implementation of different inverses and datasets
 addpath('../docker/test-datasets/')
 addpath(genpath('Numerical_Methods/'))
+addpath(genpath('/home/retina/dembysj/Dropbox/research/for_docker/datasets/'))
 
 
 %% initialize global parameters and running modes
 %robot_list = ["RRRRRRR"] %, "RRPRRRR"];
 
-robot_list = ["6DoF-6R-Jaco", "6DoF-6R-Puma560", "6DoF-6R-Mico", "6DoF-6R-IRB140", "6DoF-6R-KR5", ...
+%{
+robot_list = ["6DoF-6R-Puma560", "6DoF-6R-Mico", "6DoF-6R-IRB140", "6DoF-6R-KR5", ...
             "6DoF-6R-UR10", "6DoF-6R-UR3", "6DoF-6R-UR5", "6DoF-6R-Puma260", "6DoF-2RP3R-Stanford", ...
             "7DoF-7R-Jaco2", "7DoF-7R-Panda", "7DoF-7R-WAM", "7DoF-7R-Baxter", "7DoF-7R-Sawyer", ...
             "7DoF-7R-KukaLWR4+", "7DoF-7R-PR2Arm", "7DoF-7R-PA10", "7DoF-7R-Gen3", "7DoF-2RP4R-GP66+1"];
+%}
+
+
+%robot_list = ["6DoF-6R-UR10"] %,
+robot_list = ["6DoF-6R-Puma260", "6DoF-6R-UR10"] %, "7DoF-7R-WAM", "7DoF-7R-Sawyer"];
+
 
 for r=1:length(robot_list)
 
     robot = robot_list(r); %'RRRRRRR';   % RRRRRRR (7R-Panda), RRPRRRR (2RP4R-GP66+1)
     units  = ["m"];
-    inverses = ["SVF", "SD", "MX"] %, "SD", "SVF"]; % SD, SVF
+    inverses = ["MP"] %, "SD", "SVF"]; % SD, SVF
     jacobian_type = 'geometric';                % "numerical", "geometric", "analytical"
     motion = strcat('Comparative_Results_with_Numerical_Methods/',robot,'_Using_',jacobian_type,'_Jacobian');
     
-    mode_run = "debug";                           % "run" or "debug"
+    mode_run = "run";                           % "run" or "debug"
     mode_print = "False";
     mode_print_result = "True";
     mode_save = "True";
@@ -39,14 +47,14 @@ for r=1:length(robot_list)
     
         %% load the related sample points and initialize the summary matrices   
         if contains(robot, "7DoF")
-            native_data = readtable(strcat('review_data_',robot,'_1000000_qlim_scale_10_seq_',num2str(seq),'_test.csv'));
+            native_data = readtable(strcat('review_data_',robot,'_100000_qlim_scale_10_seq_',num2str(seq),'.csv'));
             native_data = table2array(native_data);
             dataPoints7DoFR = native_data(:,20:26);            % load poses (positions + orientations) 14-19 for poses / 20-26 for joints
             dataPoints7DoFR_algo = native_data(:,7:13);       % load joint configurations
             samples = length(dataPoints7DoFR);
             summaryTable = zeros(samples,33);
         elseif contains(robot, "6DoF")
-            native_data = readtable(strcat('review_data_',robot,'_1000000_qlim_scale_10_seq_',num2str(seq),'_test.csv'));
+            native_data = readtable(strcat('review_data_',robot,'_100000_qlim_scale_10_seq_',num2str(seq),'.csv'));
             native_data = table2array(native_data);
             dataPoints7DoFR = native_data(:,19:24);            % load poses (positions + orientations)
             dataPoints7DoFR_algo = native_data(:,7:12);       % load joint configurations
@@ -58,9 +66,9 @@ for r=1:length(robot_list)
         %% choose the number of samples and iterations for "debug" or "run" modes
         if strcmp(mode_run, "debug")
             samples = 1;
-            iterations = 500;
+            iterations = 1000;
         else
-            iterations = 500;
+            iterations = 1000;
         end
         
         
