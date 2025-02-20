@@ -18,6 +18,7 @@ import math
 import sys
 import wandb
 import yaml
+import optuna
 
 from sklearn.preprocessing import MinMaxScaler
 from torch.utils.data import Dataset, DataLoader
@@ -319,6 +320,26 @@ if __name__ == '__main__':
     train_data_loader, test_data_loader, train_test_val_all, sc_in = load_all_dataset_2(data, n_DoF, batch_size, robot_choice, dataset_type, device, input_dim, robot_list, robot_list_test)
 
 
+    # set optimizer
+    if optimizer_choice == "SGD":
+        optimizer = optim.SGD(model.parameters(), lr=learning_rate, momentum=0.9, nesterov=True)
+    elif optimizer_choice == "Adam":
+        optimizer = optim.Adam(model.parameters(), lr=learning_rate)
+    elif optimizer_choice == "AdamW":
+        optimizer = optim.AdamW(model.parameters(), lr=learning_rate, weight_decay=1e-2)
+    elif optimizer_choice == "Adadelta":
+        optimizer = optim.Adadelta(model.parameters())
+    elif optimizer_choice == "RMSprop":
+        optimizer = optim.RMSprop(model.parameters())
+    
+    # set loss
+    if loss_choice == "lq":
+        criterion = nn.MSELoss(reduction="mean")
+    elif loss_choice == "l1":
+        criterion = nn.L1Loss(reduction="mean")
+    elif loss_choice == "ld":
+        criterion = FKLoss(robot_choice=robot_choice, device=device)
+
 
     #print(train_test_val_all[robot_list[0]]["X_test"].shape)
     
@@ -374,11 +395,6 @@ if __name__ == '__main__':
         model = GPT3ForRegression(input_dim=input_dim, output_dim=output_dim, embed_dim=embed_dim, num_heads=num_head, num_layers=num_layers, ff_dim=hidden_layer_sizes[0])
         save_layers_str = "embed_dim_"+ str(embed_dim)+"_heads_"+ str(num_head)+"_layers_"+ str(num_layers)
     
-    
-    
-    
-    
-    
     if init_type == "uniform":
         model.apply(weights_init_uniform_rule)
     elif init_type == "normal":
@@ -395,28 +411,7 @@ if __name__ == '__main__':
     model = model.to(device)
     print("==> Architecture: {}\n{}".format(model.name, model))
     print("==> Trainable parameters: {}".format(count_parameters(model)))
-    
-    # set optimizer
-    if optimizer_choice == "SGD":
-        optimizer = optim.SGD(model.parameters(), lr=learning_rate, momentum=0.9, nesterov=True)
-    elif optimizer_choice == "Adam":
-        optimizer = optim.Adam(model.parameters(), lr=learning_rate)
-    elif optimizer_choice == "AdamW":
-        optimizer = optim.AdamW(model.parameters(), lr=learning_rate, weight_decay=1e-2)
-    elif optimizer_choice == "Adadelta":
-        optimizer = optim.Adadelta(model.parameters())
-    elif optimizer_choice == "RMSprop":
-        optimizer = optim.RMSprop(model.parameters())
-    
-    # set loss
-    if loss_choice == "lq":
-        criterion = nn.MSELoss(reduction="mean")
-    elif loss_choice == "l1":
-        criterion = nn.L1Loss(reduction="mean")
-    elif loss_choice == "ld":
-        criterion = FKLoss(robot_choice=robot_choice, device=device)
-    
-    
+      
 
 
     print("\n==> Experiment {} Training network: {}".format(experiment_number, model.name))
