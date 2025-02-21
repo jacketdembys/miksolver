@@ -72,7 +72,7 @@ joint_variation = args.jvar
 seed_choice = args.seed
 model_str = args.model
 
-if model_str == "resmlp":
+if model_str == "rmlp":
     model = "ResMLP" 
 if model_str == "dmlp":
     model = "DenseMLP3" 
@@ -131,7 +131,7 @@ config_info = {
             'RESUMED_G_MODEL': "",
         },
         'HYPERPARAMETERS': {
-            'EPOCHS': 1000,
+            'EPOCHS': 50,
             'BATCH_SIZE': 128, #128, #100000
             'SHUFFLE': True,
             'NUM_WORKERS': 4,
@@ -146,7 +146,7 @@ config_info = {
             'LOSS': 'lq',           # lq, ld
         },
         'PRINT_EPOCHS': True,
-        'PRINT_STEPS': 100
+        'PRINT_STEPS': 5
     },
 }
 
