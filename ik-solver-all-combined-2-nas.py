@@ -90,7 +90,7 @@ def train_and_evaluate(trial):
 
     experiment_number = experiments
 
-    data_path = "../for_docker/datasets"
+    data_path = "/home/datasetss"
 
     print("==> Running based on configuration...")
     device = torch.device('cuda:'+str(config["DEVICE_ID"]) if torch.cuda.is_available() else 'cpu') 
