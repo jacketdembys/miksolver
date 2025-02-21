@@ -13,4 +13,5 @@ __pycache__/
 *.mm
 *.asv
 7DoF*
+*.db
 Comparative_Results_with_Numerical_Methods/
