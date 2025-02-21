@@ -356,7 +356,7 @@ def train_and_evaluate(trial):
                 print('\tValid Loss: {}'.format(valid_loss))
                 print("\tBest Epoch Occurred [{}/{}]".format(best_epoch, EPOCHS)) 
 
-            #torch.save(model.state_dict(), save_path+'/best_epoch.pth')   
+            torch.save(model.state_dict(), save_path+'/best_epoch.pth')   
                         
             # save the histories of losses
             
