@@ -407,8 +407,14 @@ def train_and_evaluate(trial):
         X_test = train_test_val_all[r]["X_test"]
         y_test = train_test_val_all[r]["y_test"]
 
-        #X_test = X_test[:1000,:]
-        #y_test = y_test[:1000,:]
+
+        # Select 25% of rows (i.e., 2 rows out of 10)
+        num_rows = arr.shape[0]
+        subset_size = int(num_rows * 0.25)  # 25% of rows
+        random_indices = np.random.choice(num_rows, subset_size, replace=False)
+
+        X_test = X_test[:random_indices,:]
+        y_test = y_test[:random_indices,:]
 
 
         print("\n\n==> Testing the trained model on  {} ...".format(r))
@@ -433,9 +439,10 @@ def train_and_evaluate(trial):
 
         print("avg_position_error (mm): {}".format(avg_position_error))
         print("avg_orientation_error (deg): {}".format(avg_orientation_error))
+        inference_results_all.append(np.mean([avg_position_error, avg_orientation_error]))
 
 
-    return np.mean([avg_position_error, avg_orientation_error])
+    return np.mean(np.array(inference_results_all))
 
 
 if __name__ == "__main__":

@@ -1698,7 +1698,7 @@ def load_test_all_dataset(X_test, y_test, device, sc_in):
                                    drop_last=False,
                                    shuffle=False,
                                    pin_memory=False,
-                                   num_workers=8,
+                                   num_workers=2,
                                    persistent_workers=True)
 
     return test_data_loader
