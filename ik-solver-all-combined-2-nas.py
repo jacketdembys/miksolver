@@ -407,8 +407,8 @@ def train_and_evaluate(trial):
         X_test = train_test_val_all[r]["X_test"]
         y_test = train_test_val_all[r]["y_test"]
 
-        X_test = X_test[:1000,:]
-        y_test = y_test[:1000,:]
+        #X_test = X_test[:1000,:]
+        #y_test = y_test[:1000,:]
 
 
         print("\n\n==> Testing the trained model on  {} ...".format(r))
