@@ -442,6 +442,18 @@ if __name__ == "__main__":
 
     # Drag and drop the storage file on the browser: https://optuna.github.io/optuna-dashboard/
 
+    print('==> Log in to wandb to send out metrics ...')
+    wandb.login()                                        # login to the Weights and Biases   
+            
+
+
+    run = wandb.init(
+        entity="jacketdembys",
+        project = "ik-steps-2",                
+        group = "IROS_25_Search_"+config["MODEL"]["NAME"] +"_"+"Combined_Dataset_"+str(config["TRAIN"]["DATASET"]["NUM_SAMPLES"] )+"_Scale_"+str(int(config["TRAIN"]["DATASET"]["JOINT_LIMIT_SCALE"]))+"_"+config["TRAIN"]["DATASET"]["TYPE"]+"_"+config["TRAIN"]["HYPERPARAMETERS"]["LOSS"],  # "_seq", "_1_to_1"
+        name = config["MODEL"]["NAME"]+"_"+config["ROBOT_CHOICE"]+"_" + str(config["TRAIN"]["HYPERPARAMETERS"]["BATCH_SIZE"]) +"_" \
+                +config["TRAIN"]["HYPERPARAMETERS"]["OPTIMIZER_NAME"]+"_"+config["TRAIN"]["HYPERPARAMETERS"]["LOSS"]+"_run_"+str(config["NUM_EXPERIMENT_REPETITIONS"])+'_qlim_scale_'+str(int(config["TRAIN"]["DATASET"]["JOINT_LIMIT_SCALE"]))+'_samples_'+str(config["TRAIN"]["DATASET"]["NUM_SAMPLES"] )+"_"+config["TRAIN"]["DATASET"]["ORIENTATION"]+"_"+str(config["TRAIN"]["HYPERPARAMETERS"]["LEARNING_RATE"])+"_js_"+str(config["TRAIN"]["DATASET"]["JOINT_VARIATION"])   #+'_non_traj_split', '_traj_split'   
+            )
 
     # Initialize optuna
     sampler = optuna.samplers.TPESampler(seed=10)
@@ -469,18 +481,7 @@ if __name__ == "__main__":
     print(all_trials)
 
     
-    print('==> Log in to wandb to send out metrics ...')
-    wandb.login()                                        # login to the Weights and Biases   
-            
-
-
-    run = wandb.init(
-        entity="jacketdembys",
-        project = "ik-steps-2",                
-        group = "IROS_25_Search_"+config["MODEL"]["NAME"] +"_"+"Combined_Dataset_"+str(config["TRAIN"]["DATASET"]["NUM_SAMPLES"] )+"_Scale_"+str(int(config["TRAIN"]["DATASET"]["JOINT_LIMIT_SCALE"]))+"_"+config["TRAIN"]["DATASET"]["TYPE"]+"_"+config["TRAIN"]["HYPERPARAMETERS"]["LOSS"],  # "_seq", "_1_to_1"
-        name = config["MODEL"]["NAME"]+"_"+config["ROBOT_CHOICE"]+"_" + str(config["TRAIN"]["HYPERPARAMETERS"]["BATCH_SIZE"]) +"_" \
-                +config["TRAIN"]["HYPERPARAMETERS"]["OPTIMIZER_NAME"]+"_"+config["TRAIN"]["HYPERPARAMETERS"]["LOSS"]+"_run_"+str(config["NUM_EXPERIMENT_REPETITIONS"])+'_qlim_scale_'+str(int(config["TRAIN"]["DATASET"]["JOINT_LIMIT_SCALE"]))+'_samples_'+str(config["TRAIN"]["DATASET"]["NUM_SAMPLES"] )+"_"+config["TRAIN"]["DATASET"]["ORIENTATION"]+"_"+str(config["TRAIN"]["HYPERPARAMETERS"]["LEARNING_RATE"])+"_js_"+str(config["TRAIN"]["DATASET"]["JOINT_VARIATION"])   #+'_non_traj_split', '_traj_split'   
-            )
+  
 
     
     print(best_params)
