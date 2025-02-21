@@ -356,15 +356,16 @@ def train_and_evaluate(trial):
                 print('\tValid Loss: {}'.format(valid_loss))
                 print("\tBest Epoch Occurred [{}/{}]".format(best_epoch, EPOCHS)) 
 
-            torch.save(model.state_dict(), save_path+'/best_epoch.pth')   
+            #torch.save(model.state_dict(), save_path+'/best_epoch.pth')   
                         
             # save the histories of losses
-            header = ["train loss", "valid loss"]
             
-            df = pd.DataFrame(np.array(all_losses))
-            df.to_csv(save_path+"/losses_"+robot_choice+"_"+str(dataset_samples)+".csv",
-                index=False,
-                header=header)
+            #header = ["train loss", "valid loss"]
+            
+            #df = pd.DataFrame(np.array(all_losses))
+            #df.to_csv(save_path+"/losses_"+robot_choice+"_"+str(dataset_samples)+".csv",
+            #    index=False,
+            #    header=header)
 
 
 
@@ -409,12 +410,12 @@ def train_and_evaluate(trial):
 
 
         # Select 25% of rows (i.e., 2 rows out of 10)
-        num_rows = arr.shape[0]
+        num_rows = X_test.shape[0]
         subset_size = int(num_rows * 0.25)  # 25% of rows
         random_indices = np.random.choice(num_rows, subset_size, replace=False)
 
-        X_test = X_test[:random_indices,:]
-        y_test = y_test[:random_indices,:]
+        X_test = X_test[random_indices,:]
+        y_test = y_test[random_indices,:]
 
 
         print("\n\n==> Testing the trained model on  {} ...".format(r))
