@@ -146,7 +146,7 @@ config_info = {
             'LOSS': 'lq',           # lq, ld
         },
         'PRINT_EPOCHS': True,
-        'PRINT_STEPS': 5
+        'PRINT_STEPS': 100
     },
 }
 
