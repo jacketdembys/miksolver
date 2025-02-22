@@ -19,14 +19,14 @@ robot_list = ["6DoF-6R-Puma560", "6DoF-6R-Mico", "6DoF-6R-IRB140", "6DoF-6R-KR5"
 
 
 %robot_list = ["6DoF-6R-UR10"] %,
-robot_list = ["6DoF-6R-Puma260", "6DoF-6R-UR10"] %, "7DoF-7R-WAM", "7DoF-7R-Sawyer"];
+robot_list = ["6DoF-6R-Puma260", "6DoF-6R-UR10", "7DoF-7R-WAM", "7DoF-7R-Sawyer"];
 
 
 for r=1:length(robot_list)
 
     robot = robot_list(r); %'RRRRRRR';   % RRRRRRR (7R-Panda), RRPRRRR (2RP4R-GP66+1)
     units  = ["m"];
-    inverses = ["MP"] %, "SD", "SVF"]; % SD, SVF
+    inverses = ["MP", "SD", "SVF"]; % SD, SVF
     jacobian_type = 'geometric';                % "numerical", "geometric", "analytical"
     motion = strcat('Comparative_Results_with_Numerical_Methods/',robot,'_Using_',jacobian_type,'_Jacobian');
     
@@ -43,7 +43,7 @@ for r=1:length(robot_list)
         mkdir(motion)
     end
     
-    for seq=1:1
+    for seq=2:2:20
     
         %% load the related sample points and initialize the summary matrices   
         if contains(robot, "7DoF")
