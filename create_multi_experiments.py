@@ -131,7 +131,7 @@ for sr in range(args.seed):
                 'RESUMED_G_MODEL': "",
             },
             'HYPERPARAMETERS': {
-                'EPOCHS': 1000,
+                'EPOCHS': 50,
                 'BATCH_SIZE': 128, #128, #100000
                 'SHUFFLE': True,
                 'NUM_WORKERS': 4,
