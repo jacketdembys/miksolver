@@ -9,15 +9,15 @@ import torch
 if __name__ == '__main__':
 
     base_path = 'Comparative_Results_with_Numerical_Methods/'
-    robot_calls = ['6DoF-6R-UR10', '6DoF-6R-Puma260'] #, '7DoF-7R-WAM', '7DoF-7R-Sawyer']
+    robot_calls = ['6DoF-6R-UR10', '6DoF-6R-Puma260','7DoF-7R-WAM', '7DoF-7R-Sawyer'] #, '7DoF-7R-WAM', '7DoF-7R-Sawyer']
     #robot = robot_calls[0] # RRRRRRR, RRPRRRR
-    inverses = ['MX'] # ['SVF', 'MX', 'SD']
+    inverses = ['MP'] # ['SVF', 'MX', 'SD']
 
     for robot in robot_calls:
 
         for inverse in inverses:
 
-            for s in range(1,2): # 21  
+            for s in range(2,22,2): # 21  
 
                 print('\n==> Processing joint level {}'.format(s))
                 

@@ -156,8 +156,8 @@ if __name__ == "__main__":
     print("Testing Transformer Architecture")
 
     # Define model
-    model = GPT3ForRegression()
-    #model = GPT3ForRegression(input_dim=22, output_dim=10, embed_dim=128, num_heads=4, num_layers=3, ff_dim=256)
+    #model = GPT3ForRegression()
+    model = GPT3ForRegression(input_dim=19, output_dim=7, embed_dim=192, num_heads=12, num_layers=3, ff_dim=768)
 
     print("==> Trainable parameters: {}".format(count_parameters(model)))
 

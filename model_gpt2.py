@@ -116,7 +116,7 @@ if __name__ == "__main__":
     print("Testing Transformer Architecture")
 
     # Define model
-    model = GPT2ForRegression(input_dim=18, output_dim=6, embed_dim=192, num_heads=12, num_layers=3, ff_dim=768)
+    model = GPT2ForRegression(input_dim=19, output_dim=7, embed_dim=192, num_heads=12, num_layers=4, ff_dim=1024)
 
     print("==> Trainable parameters: {}".format(count_parameters(model)))
 

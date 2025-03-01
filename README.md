@@ -1,4 +1,4 @@
-# `Paper`: "Inverse Kinematics of Robotic Manipulators Using a New Learning-by-Example Method"
+# `Paper`: "LBE-DDIK: Is One Model Good Enough to Learn-by-Example the Inverse Kinematics of Multiple Serial Robots?"
 
 
 ## <div align="center">Requirements</div>
@@ -22,8 +22,8 @@
 <details open><summary>Clone repository</summary>
 
 ```shell
-git clone https://github.com/jacketdembys/iksolver.git
-cd iksolver
+git clone https://github.com/jacketdembys/miksolver.git
+cd miksolver
 ```
 
 </details>
@@ -51,7 +51,7 @@ python create_experiments.py
 Run the training script to train/eval/test the model:
 
 ```shell
-python ik-solver.py --config-path train.yaml
+python mik-solver.py --config-path train.yaml
 ```
 
 <!---
