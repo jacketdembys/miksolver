@@ -32,7 +32,7 @@ cd miksolver
 
 </details>
 <details open><summary>Generate datasets </summary>
-Choose the robot type in the generate_dataset.py file and run it to generate the corresponding dataset:
+Choose the dataset type in the generate_dataset.py file and run it to generate the corresponding dataset:
 
 ```shell
 python generate_dataset.py
