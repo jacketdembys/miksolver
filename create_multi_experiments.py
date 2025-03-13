@@ -94,7 +94,7 @@ if args.dataset == "all67":
     data_choice = 'combine-up-to-7DoF'
 else:
     robot_choice = '7DoF-7R-Panda'   #'7DoF-7R-Panda' '7DoF-GP66' 
-    data_choice = 'combine-up-to-7DoF'
+    data_choice = args.dataset
 
 
 # read from path script
