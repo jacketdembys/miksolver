@@ -149,7 +149,7 @@ def train_loop(model, train_loader, val_loader, max_epochs=10, lr=1e-4, robot_na
     for epoch in range(max_epochs):
         model.train()
         epoch_loss = 0.0
-        print(f"\n[Epoch {epoch+1}/{max_epochs} - Best Epoch {best_epoch}]")
+        print(f"\n[Epoch {epoch+1}/{max_epochs}]")
         start_time = time.monotonic()
         for batch in train_loader:
             q = batch["q"].to(device)
@@ -175,9 +175,19 @@ def train_loop(model, train_loader, val_loader, max_epochs=10, lr=1e-4, robot_na
         avg_position_error = X_errors_r[1,:3].mean()
         avg_orientation_error = X_errors_r[1,3:].mean()
 
-               
-        print(f"Train Loss: {train_loss:.6f} | Val Loss: {val_loss:.6f} | xyz(mm): {avg_position_error:.2f} | RPY(deg): {avg_orientation_error:.2f}")
+        train_metrics= {
+                "train/train_loss": train_loss,
+            }
+        
+        val_metrics = {
+                "val/val_loss": val_loss,
+                "val/xyz(mm)": avg_position_error,
+                "val/RPY(deg)": avg_orientation_error
+            }
+        wandb.log({**train_metrics, **val_metrics})
 
+               
+        
         pose_loss = (avg_position_error + avg_position_error)/2
         if pose_loss < best_pose_loss:
             best_pose_loss = pose_loss
@@ -192,16 +202,8 @@ def train_loop(model, train_loader, val_loader, max_epochs=10, lr=1e-4, robot_na
 
 
 
-        train_metrics= {
-                "train/train_loss": train_loss,
-            }
-        
-        val_metrics = {
-                "val/val_loss": val_loss,
-                "val/xyz(mm)": avg_position_error,
-                "val/RPY(deg)": avg_orientation_error
-            }
-        wandb.log({**train_metrics, **val_metrics})
+        print(f"Train Loss: {train_loss:.6f} | Val Loss: {val_loss:.6f} | xyz(mm): {avg_position_error:.2f} | RPY(deg): {avg_orientation_error:.2f} | Best Epoch {best_epoch}")
+
 
         end_time = time.monotonic()
         epoch_mins, epoch_secs = epoch_time(start_time, end_time)
