@@ -144,11 +144,12 @@ def train_loop(model, train_loader, val_loader, max_epochs=10, lr=1e-4, robot_na
         )
 
     best_pose_loss = float('inf')
+    best_epoch = 0
 
     for epoch in range(max_epochs):
         model.train()
         epoch_loss = 0.0
-        print(f"\n[Epoch {epoch+1}/{max_epochs}]")
+        print(f"\n[Epoch {epoch+1}/{max_epochs} - Best Epoch {best_epoch}]")
         start_time = time.monotonic()
         for batch in train_loader:
             q = batch["q"].to(device)
@@ -213,7 +214,7 @@ def train_loop(model, train_loader, val_loader, max_epochs=10, lr=1e-4, robot_na
 if __name__ == "__main__":
 
     batch_size = 128
-    max_epochs = 1
+    max_epochs = 2
     dof = 7
     pose_dim = 7
     robot_name = "panda"
