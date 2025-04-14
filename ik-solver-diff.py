@@ -57,6 +57,6 @@ if __name__ == "__main__":
 
     filename_Dte = '/home/miksolver/ik_datasets/panda/endpoints_te.npy'
     filename_Qte = '/home/miksolver/ik_datasets/panda/samples_te.npy'
-    val_dataset = DiffIKDataset(filename_Dte, filename_Qte, device) 
+    val_dataset = DiffIKDataset(filename_Dte, filename_Qte) 
     val_loader = DataLoader(val_dataset, 
                             batch_size=batch_size)
