@@ -93,7 +93,7 @@ def validate(model, val_loader, device, robot_name):
         monitored_total_loss = total_loss / len(val_loader)
 
         y_preds = np.concatenate(y_preds, axis=0)
-        y_desireds = np.array(y_desireds, axis=0)
+        y_desireds = np.concatenate(y_desireds, axis=0)
 
         print(y_preds.shape)
         print(y_desireds.shape)
