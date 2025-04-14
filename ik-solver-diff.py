@@ -12,7 +12,7 @@ class DiffIKDataset(Dataset):
         self.pose = torch.from_numpy(np.load(filename_D)).float() #.to(device)
         
         print(f"Loaded Dataset:\nq.shape: {self.q.shape}\npose.shape: {self.pose.shape}")
-        print(f"Loaded Dataset initially on --> Device: {self.q.device}")
+        print(f"Loaded Dataset initially on --> device: {self.q.device}")
 
         assert self.q.shape[0] == self.pose.shape[0], "Mismatch in sample count"
 
@@ -45,3 +45,18 @@ if __name__ == "__main__":
     filename_Dtr = '/home/miksolver/ik_datasets/panda/endpoints_tr.npy'
     filename_Qtr = '/home/miksolver/ik_datasets/panda/samples_tr.npy'
     train_dataset = DiffIKDataset(filename_Dtr, filename_Qtr)
+    train_loader = DataLoader(
+        train_dataset,
+        batch_size=batch_size,
+        shuffle=True,
+        num_workers=0,
+        pin_memory=False,
+        drop_last=False,
+    )
+
+
+    filename_Dte = '/home/miksolver/ik_datasets/panda/endpoints_te.npy'
+    filename_Qte = '/home/miksolver/ik_datasets/panda/samples_te.npy'
+    val_dataset = DiffIKDataset(filename_Dte, filename_Qte, device) 
+    val_loader = DataLoader(val_dataset, 
+                            batch_size=batch_size)
