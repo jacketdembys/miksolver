@@ -25,6 +25,14 @@ from tqdm import tqdm
 from scipy import stats
 
 # get DH matrix based on robot choice
+def get_robot_choice(robot_name):
+    if robot_name == "panda":
+        robot_choice = "7DoF-7R-Panda"
+
+    return robot_choice
+
+
+
 def get_DH(robot_choice, t):
     if robot_choice == "2DoF-2R":
         DH = torch.tensor([[t[0], 0, 1, 0],
