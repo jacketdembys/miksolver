@@ -83,8 +83,13 @@ def validate(model, val_loader, device, robot_name):
 
             # compute prediction and FK error
             q_pred = sample(model, pose_gt)
-            y_preds.append(q_pred.detach().cpu().numpy().squeeze())
-            y_desireds.append(q_gt.detach().cpu().numpy().squeeze())
+            q_pred = q_pred.detach().cpu().numpy().squeeze()
+            print(q_pred.shape)
+            y_preds.append(q_pred)
+
+            q_gt = q_gt.detach().cpu().numpy().squeeze()
+            print(q_gt.shape)
+            y_desireds.append(q_gt)
 
 
         monitored_total_loss = total_loss / len(val_loader)
