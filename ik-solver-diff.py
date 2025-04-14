@@ -4,8 +4,9 @@ from torch.utils.data import Dataset, DataLoader
 import os
 import numpy as np
 import sys
+import time
 import random
-from utils import get_robot_choice, reconstruct_pose_modified
+from utils import get_robot_choice, reconstruct_pose_modified, epoch_time
 
 # --- Dataset Loader ---
 class DiffIKDataset(Dataset):
@@ -129,6 +130,7 @@ def train_loop(model, train_loader, val_loader, max_epochs=10, lr=1e-4, robot_na
         model.train()
         epoch_loss = 0.0
         print(f"\n[Epoch {epoch+1}/{max_epochs}]")
+        start_time = time.monotonic()
         for batch in train_loader:
             q = batch["q"].to(device)
             pose = batch["pose"].to(device)
@@ -154,11 +156,14 @@ def train_loop(model, train_loader, val_loader, max_epochs=10, lr=1e-4, robot_na
         avg_orientation_error = X_errors_r[1,3:].mean()
 
                
-        print(f"Train Loss: {train_loss:.6f} | Val Loss: {val_loss:.6f} | xyz: {avg_position_error:.6f} | RPY: {avg_orientation_error:.6f}")
+        print(f"Train Loss: {train_loss:.6f} | Val Loss: {val_loss:.6f} | xyz: {avg_position_error:.2f} | RPY: {avg_orientation_error:.2f}")
         #print(f"avg_position_error (mm): {avg_position_error}")
         #print(f"avg_orientation_error (deg): {avg_orientation_error}")
 
-
+        end_time = time.monotonic()
+        epoch_mins, epoch_secs = epoch_time(start_time, end_time)
+        print(f'Epoch Time: {epoch_mins}m {epoch_secs}s')
+                
 
 # --- Main ---
 if __name__ == "__main__":
