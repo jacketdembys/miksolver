@@ -1,6 +1,6 @@
 import torch
 import torch.nn as nn
-from torch.utils.data import Dataset, DataLoader
+from torch.utils.data import Dataset, DataLoader, Subset
 import os
 import numpy as np
 import sys
@@ -239,9 +239,11 @@ if __name__ == "__main__":
         os.path.join(dataset_path, "endpoints_te.npy"),
         os.path.join(dataset_path, "samples_te.npy")
     )
+    val_indices = np.random.choice(len(val_dataset), size=1000, replace=False)
+    val_subset = Subset(val_dataset, val_indices)
 
     train_loader = DataLoader(train_dataset, batch_size=batch_size, shuffle=True)
-    val_loader = DataLoader(val_dataset, batch_size=batch_size)
+    val_loader = DataLoader(val_subset, batch_size=batch_size)
 
     model = DiffIKDenoiser(dof=dof, pose_dim=pose_dim)
     train_loop(model, train_loader, val_loader, max_epochs=max_epochs, robot_name=robot_name, save_on_wand=save_on_wand)
