@@ -118,7 +118,7 @@ def validate(model, val_loader, device, robot_choice):
     return monitored_total_loss, results
 
 # --- Training Loop ---
-def train_loop(model, train_loader, val_loader, max_epochs=10, lr=1e-4, robot_name="panda", save_on_wand=True):
+def train_loop(model, train_loader, val_loader, max_epochs=10, lr=1e-4, robot_name="panda", save_on_wand=True, print_steps=100):
     
     save_path = "results"
     if not os.path.exists(save_path):
@@ -145,6 +145,8 @@ def train_loop(model, train_loader, val_loader, max_epochs=10, lr=1e-4, robot_na
 
     best_pose_loss = float('inf')
     best_epoch = 0
+
+    start_training_time = time.monotonic()
 
     for epoch in range(max_epochs):
         model.train()
@@ -205,9 +207,18 @@ def train_loop(model, train_loader, val_loader, max_epochs=10, lr=1e-4, robot_na
         print(f"Train Loss: {train_loss:.6f} | Val Loss: {val_loss:.6f} | xyz(mm): {avg_position_error:.2f} | RPY(deg): {avg_orientation_error:.2f} | Best Epoch {best_epoch}")
 
 
-        end_time = time.monotonic()
-        epoch_mins, epoch_secs = epoch_time(start_time, end_time)
-        print(f'Epoch Time: {epoch_mins}m {epoch_secs}s')
+                
+        if epoch % (max_epochs/print_steps) == 0 or epoch == max_epochs-1:
+            print(f"Train Loss: {train_loss:.6f} | Val Loss: {val_loss:.6f} | xyz(mm): {avg_position_error:.2f} | RPY(deg): {avg_orientation_error:.2f} | Best Epoch {best_epoch}")
+            
+            end_time = time.monotonic()
+            epoch_mins, epoch_secs = epoch_time(start_time, end_time)
+            print(f'Epoch Time: {epoch_mins}m {epoch_secs}s')
+
+            end_training_time = time.monotonic()
+            train_mins, train_secs = epoch_time(start_training_time, end_training_time)
+            print(f'Been Training for: {train_mins}m {train_secs}s')
+
 
     wandb.finish()
                 
@@ -239,7 +250,7 @@ if __name__ == "__main__":
         os.path.join(dataset_path, "endpoints_te.npy"),
         os.path.join(dataset_path, "samples_te.npy")
     )
-    val_indices = np.random.choice(len(val_dataset), size=1000, replace=False)
+    val_indices = np.random.choice(len(val_dataset), size=2000, replace=False)
     val_subset = Subset(val_dataset, val_indices)
 
     train_loader = DataLoader(train_dataset, batch_size=batch_size, shuffle=True)
