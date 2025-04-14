@@ -214,7 +214,7 @@ def train_loop(model, train_loader, val_loader, max_epochs=10, lr=1e-4, robot_na
 if __name__ == "__main__":
 
     batch_size = 128
-    max_epochs = 2
+    max_epochs = 3
     dof = 7
     pose_dim = 7
     robot_name = "panda"
