@@ -79,8 +79,8 @@ def validate(model, val_loader, device, robot_name):
 
             # compute prediction and FK error
             q_pred = sample(model, pose_gt)
-            y_preds = q_pred
-            y_desireds = q_gt
+            y_preds = q_pred.detach().cpu().numpy()
+            y_desireds = q_gt.detach().cpu().numpy()
 
             print(q_pred.shape)
             X_desireds, X_preds, X_errors = reconstruct_pose_modified(y_desireds, y_preds, robot_choice)
