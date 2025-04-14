@@ -4,6 +4,7 @@ from torch.utils.data import Dataset, DataLoader
 import os
 import numpy as np
 import sys
+from utils import *
 
 # --- Dataset Loader ---
 class DiffIKDataset(Dataset):
@@ -117,7 +118,7 @@ if __name__ == "__main__":
     torch.manual_seed(0)
 
     batch_size = 128
-    max_epochs = 20
+    max_epochs = 1
     dof = 7
     pose_dim = 7
 
