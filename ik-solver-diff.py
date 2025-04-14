@@ -7,7 +7,7 @@ import sys
 import time
 import random
 import wandb
-from utils import get_robot_choice, reconstruct_pose_modified, epoch_time
+from utils import get_robot_choice, reconstruct_pose_modified, epoch_time, count_parameters
 
 # --- Dataset Loader ---
 class DiffIKDataset(Dataset):
@@ -244,4 +244,5 @@ if __name__ == "__main__":
     val_loader = DataLoader(val_subset, batch_size=batch_size)
 
     model = DiffIKDenoiser(dof=dof, pose_dim=pose_dim)
+    print("Model Trainable Parameters: {}".format(count_parameters(model)))
     train_loop(model, train_loader, val_loader, max_epochs=max_epochs, robot_name=robot_name, save_on_wand=save_on_wand)
