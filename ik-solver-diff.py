@@ -11,7 +11,7 @@ class DiffIKDataset(Dataset):
         self.q = torch.from_numpy(np.load(filename_Q)).float() #.to(device)
         self.pose = torch.from_numpy(np.load(filename_D)).float() #.to(device)
         
-        print(f"Loaded q.shape: {self.q.shape}, pose.shape: {self.pose.shape}")
+        print(f"Loaded Dataset\nq.shape: {self.q.shape}\npose.shape: {self.pose.shape}")
         print(f"Device: {self.q.device}")
 
         assert self.q.shape[0] == self.pose.shape[0], "Mismatch in sample count"
