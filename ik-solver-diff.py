@@ -62,6 +62,11 @@ def validate(model, val_loader, device, robot_name):
     total_loss = 0.0
     loss_fn = nn.MSELoss()
     robot_choice = get_robot_choice(robot_name)
+
+
+    y_preds = []
+    y_desireds = []
+
     with torch.no_grad():
         for batch in val_loader:
             q_gt = batch["q"].to(device)
@@ -74,44 +79,39 @@ def validate(model, val_loader, device, robot_name):
             q_t = q_gt + beta * noise
             noise_pred = model(q_t, pose_gt, t)
             loss = loss_fn(noise_pred, noise)
-            total_loss += loss.item()
-            monitored_total_loss = total_loss / len(val_loader)
+            total_loss += loss.item()            
 
             # compute prediction and FK error
             q_pred = sample(model, pose_gt)
-            y_preds = q_pred.detach().cpu().numpy()
-            y_desireds = q_gt.detach().cpu().numpy()
+            y_preds.append(q_pred.detach().cpu().numpy())
+            y_desireds.append(q_gt.detach().cpu().numpy())
 
-            print(q_pred.shape)
-            X_desireds, X_preds, X_errors = reconstruct_pose_modified(y_desireds, y_preds, robot_choice)
-            X_errors_report = np.array([[X_errors.min(axis=0)],
-                                        [X_errors.mean(axis=0)],
-                                        [X_errors.max(axis=0)],
-                                        [X_errors.std(axis=0)]]).squeeze()
-            
-            
-            X_errors_r = X_errors[:,:6]
-            X_errors_r[:,:3] = X_errors_r[:,:3] * 1000
-            X_errors_r[:,3:] = np.rad2deg(X_errors_r[:,3:]) 
-            avg_position_error = X_errors_r[1,:3].mean()
-            avg_orientation_error = X_errors_r[1,3:].mean()
 
-            print("avg_position_error (mm): {}".format(avg_position_error))
-            print("avg_orientation_error (deg): {}".format(avg_orientation_error))
+        monitored_total_loss = total_loss / len(val_loader)
 
-            
-            
-            results = {
-                "y_preds": y_preds,
-                "X_preds": X_preds,
-                "y_desireds": y_desireds,
-                "X_desireds": X_desireds,
-                "X_errors": X_errors,
-                "X_errors_report": X_errors_report
-            }
-            sys.exit()
+        y_preds = np.array(y_preds)
+        y_desireds = np.array(y_desireds)
 
-    return monitored_total_loss
+        print(y_preds.shape)
+        print(y_desireds.shape)
+        X_desireds, X_preds, X_errors = reconstruct_pose_modified(y_desireds, y_preds, robot_choice)
+        X_errors_report = np.array([[X_errors.min(axis=0)],
+                                    [X_errors.mean(axis=0)],
+                                    [X_errors.max(axis=0)],
+                                    [X_errors.std(axis=0)]]).squeeze()
+        
+        
+        results = {
+            "y_preds": y_preds,
+            "X_preds": X_preds,
+            "y_desireds": y_desireds,
+            "X_desireds": X_desireds,
+            "X_errors": X_errors,
+            "X_errors_report": X_errors_report
+        }
+            
+
+    return monitored_total_loss, results
 
 # --- Training Loop ---
 def train_loop(model, train_loader, val_loader, max_epochs=10, lr=1e-4, robot_name="panda"):
@@ -140,8 +140,21 @@ def train_loop(model, train_loader, val_loader, max_epochs=10, lr=1e-4, robot_na
             epoch_loss += loss.item()
 
         train_loss = epoch_loss / len(train_loader)
-        val_loss = validate(model, val_loader, device, robot_name)
+        val_loss, val_results = validate(model, val_loader, device, robot_name)
+        
+        X_errors = val_results["X_errors_report"]
+        X_errors_r = X_errors[:,:6]
+        X_errors_r[:,:3] = X_errors_r[:,:3] * 1000
+        X_errors_r[:,3:] = np.rad2deg(X_errors_r[:,3:]) 
+        avg_position_error = X_errors_r[1,:3].mean()
+        avg_orientation_error = X_errors_r[1,3:].mean()
+
+               
         print(f"Train Loss: {train_loss:.6f} | Val Loss: {val_loss:.6f}")
+        print(f"avg_position_error (mm): {avg_position_error}")
+        print(f"avg_orientation_error (deg): {avg_orientation_error}")
+
+
 
 # --- Main ---
 if __name__ == "__main__":
