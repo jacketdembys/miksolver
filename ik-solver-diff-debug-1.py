@@ -90,17 +90,21 @@ def validate(model, val_loader, device, robot_choice):
             y_preds.append(q_pred)
             y_desireds.append(q_gt)
 
+
         monitored_total_loss = total_loss / len(val_loader)
 
         y_preds = np.concatenate(y_preds, axis=0)
         y_desireds = np.concatenate(y_desireds, axis=0)
 
+        #print(y_preds.shape)
+        #print(y_desireds.shape)
         X_desireds, X_preds, X_errors = reconstruct_pose_modified(y_desireds, y_preds, robot_choice)
         X_errors_report = np.array([[X_errors.min(axis=0)],
                                     [X_errors.mean(axis=0)],
                                     [X_errors.max(axis=0)],
                                     [X_errors.std(axis=0)]]).squeeze()
-
+        
+        
         results = {
             "y_preds": y_preds,
             "X_preds": X_preds,
@@ -109,22 +113,24 @@ def validate(model, val_loader, device, robot_choice):
             "X_errors": X_errors,
             "X_errors_report": X_errors_report
         }
+            
 
     return monitored_total_loss, results
 
 # --- Training Loop ---
 def train_loop(model, train_loader, val_loader, max_epochs=10, lr=1e-4, robot_name="panda", save_on_wand=True, print_steps=100):
+    
     save_path = "results"
     if not os.path.exists(save_path):
         os.makedirs(save_path)
 
     print(f"[Results saved in: {save_path}]")
-
+    
+    
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     print(f"[Training on device: {device}]")
     model.to(device)
     optimizer = torch.optim.AdamW(model.parameters(), lr=lr)
-    scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(optimizer, T_max=max_epochs)  # [NEW] Learning rate scheduler
     loss_fn = nn.MSELoss()
 
     robot_choice = get_robot_choice(robot_name)
@@ -139,11 +145,13 @@ def train_loop(model, train_loader, val_loader, max_epochs=10, lr=1e-4, robot_na
 
     best_pose_loss = float('inf')
     best_epoch = 0
+
     start_training_time = time.monotonic()
 
     for epoch in range(max_epochs):
         model.train()
         epoch_loss = 0.0
+        #print(f"\n[Epoch {epoch+1}/{max_epochs}]")
         start_time = time.monotonic()
         for batch in train_loader:
             q = batch["q"].to(device)
@@ -156,14 +164,12 @@ def train_loop(model, train_loader, val_loader, max_epochs=10, lr=1e-4, robot_na
             loss = loss_fn(noise_pred, noise)
             optimizer.zero_grad()
             loss.backward()
-            torch.nn.utils.clip_grad_norm_(model.parameters(), max_norm=1.0)  # [NEW] Gradient clipping
             optimizer.step()
             epoch_loss += loss.item()
 
         train_loss = epoch_loss / len(train_loader)
-        scheduler.step()  # [NEW] Step the scheduler
         val_loss, val_results = validate(model, val_loader, device, robot_choice)
-
+        
         X_errors = val_results["X_errors_report"]
         X_errors_r = X_errors[:,:6]
         X_errors_r[:,:3] = X_errors_r[:,:3] * 1000
@@ -171,32 +177,41 @@ def train_loop(model, train_loader, val_loader, max_epochs=10, lr=1e-4, robot_na
         avg_position_error = X_errors_r[1,:3].mean()
         avg_orientation_error = X_errors_r[1,3:].mean()
 
-        train_metrics = {
-            "train/train_loss": train_loss,
-        }
-
+        train_metrics= {
+                "train/train_loss": train_loss,
+            }
+        
         val_metrics = {
-            "val/val_loss": val_loss,
-            "val/xyz(mm)": avg_position_error,
-            "val/RPY(deg)": avg_orientation_error
-        }
+                "val/val_loss": val_loss,
+                "val/xyz(mm)": avg_position_error,
+                "val/RPY(deg)": avg_orientation_error
+            }
         wandb.log({**train_metrics, **val_metrics})
 
-        pose_loss = (avg_position_error + avg_orientation_error) / 2  # [FIXED]
+               
+        
+        pose_loss = (avg_position_error + avg_orientation_error)/2
         if pose_loss < best_pose_loss:
             best_pose_loss = pose_loss
             best_epoch = epoch
+            
 
-            model_filename = f'best_epoch_{best_epoch}_pose_{pose_loss:.2f}.pth'  # [NEW] Better filename
-            torch.save(model.state_dict(), os.path.join(save_path, model_filename))
-            artifact = wandb.Artifact(name=f"MLP_{robot_choice}_Data_2.5M_Bs_128_Opt_AdamW", type='model')
-            artifact.add_file(os.path.join(save_path, model_filename))
+            torch.save(model.state_dict(), save_path+f'/best_epoch_{best_epoch}.pth')
+            artifact = wandb.Artifact(name=f"MLP_{robot_choice}_Data_2.5M_Bs_128_Opt_AdamW", 
+                                    type='model')
+            artifact.add_file(save_path+f'/best_epoch_{best_epoch}.pth')
             run.log_artifact(artifact)
 
-        if epoch % (max_epochs / print_steps) == 0 or epoch == max_epochs - 1:
+
+
+        #print(f"Train Loss: {train_loss:.6f} | Val Loss: {val_loss:.6f} | xyz(mm): {avg_position_error:.2f} | RPY(deg): {avg_orientation_error:.2f} | Best Epoch {best_epoch}")
+
+
+                
+        if epoch % (max_epochs/print_steps) == 0 or epoch == max_epochs-1:
             print(f"\n[Epoch {epoch+1}/{max_epochs}]")
             print(f"Train Loss: {train_loss:.6f} | Val Loss: {val_loss:.6f} | xyz(mm): {avg_position_error:.2f} | RPY(deg): {avg_orientation_error:.2f} | Best Epoch {best_epoch}")
-
+            
             end_time = time.monotonic()
             epoch_mins, epoch_secs = epoch_time(start_time, end_time)
             print(f'Epoch Time: {epoch_mins}m {epoch_secs}s')
@@ -205,12 +220,13 @@ def train_loop(model, train_loader, val_loader, max_epochs=10, lr=1e-4, robot_na
             train_mins, train_secs = epoch_time(start_training_time, end_training_time)
             print(f'Been Training for: {train_mins}m {train_secs}s')
 
-    wandb.run.summary["best_pose_loss"] = best_pose_loss  # [NEW] Final summary
-    wandb.run.summary["best_epoch"] = best_epoch  # [NEW] Final summary
+
     wandb.finish()
+                
 
 # --- Main ---
 if __name__ == "__main__":
+
     batch_size = 128
     max_epochs = 1000
     dof = 7
