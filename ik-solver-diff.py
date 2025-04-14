@@ -3,6 +3,7 @@ import torch.nn as nn
 from torch.utils.data import Dataset, DataLoader
 import os
 import numpy as np
+import sys
 
 # --- Dataset Loader ---
 class DiffIKDataset(Dataset):
@@ -61,16 +62,25 @@ def validate(model, val_loader, device):
     loss_fn = nn.MSELoss()
     with torch.no_grad():
         for batch in val_loader:
-            q = batch["q"].to(device)
-            pose = batch["pose"].to(device)
-            noise = torch.randn_like(q)
-            t = torch.randint(0, model.num_timesteps, (q.size(0),), device=device)
+            q_gt = batch["q"].to(device)
+            pose_gt = batch["pose"].to(device)
+
+            # compute denoising loss
+            noise = torch.randn_like(q_gt)
+            t = torch.randint(0, model.num_timesteps, (q_gt.size(0),), device=device)
             beta = 1e-4 + (t / model.num_timesteps).unsqueeze(-1)
-            q_t = q + beta * noise
-            noise_pred = model(q_t, pose, t)
+            q_t = q_gt + beta * noise
+            noise_pred = model(q_t, pose_gt, t)
             loss = loss_fn(noise_pred, noise)
             total_loss += loss.item()
-    return total_loss / len(val_loader)
+            monitored_total_loss = total_loss / len(val_loader)
+
+            # compute prediction and FK error
+            q_pred = sample(model, pose_gt)
+            print(q_pred.shape)
+            sys.exit()
+
+    return monitored_total_loss
 
 # --- Training Loop ---
 def train_loop(model, train_loader, val_loader, max_epochs=10, lr=1e-4):
