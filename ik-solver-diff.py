@@ -168,7 +168,9 @@ def train_loop(model, train_loader, val_loader, max_epochs=10, lr=1e-4, robot_na
         X_errors_r = X_errors[:,:6]
         X_errors_r[:,:3] = X_errors_r[:,:3] * 1000
         X_errors_r[:,3:] = np.rad2deg(X_errors_r[:,3:]) 
-        avg_position_error = X_errors_r[1,:3].mean()
+        avg_position_error = X_errors_r[1,:3].mean()    
+        min_position_error = X_errors_r[1,:3].mean()  
+        max_position_error = X_errors_r[1,:3].mean()      
         avg_orientation_error = X_errors_r[1,3:].mean()
 
         train_metrics = {
