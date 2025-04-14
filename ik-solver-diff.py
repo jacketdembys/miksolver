@@ -6,6 +6,7 @@ import numpy as np
 import sys
 import time
 import random
+import wandb
 from utils import get_robot_choice, reconstruct_pose_modified, epoch_time
 
 # --- Dataset Loader ---
@@ -59,12 +60,10 @@ def sample(model, pose, ddim_steps=50):
     return q
 
 # --- Validation ---
-def validate(model, val_loader, device, robot_name):
+def validate(model, val_loader, device, robot_choice):
     model.eval()
     total_loss = 0.0
     loss_fn = nn.MSELoss()
-    robot_choice = get_robot_choice(robot_name)
-
 
     y_preds = []
     y_desireds = []
@@ -97,8 +96,8 @@ def validate(model, val_loader, device, robot_name):
         y_preds = np.concatenate(y_preds, axis=0)
         y_desireds = np.concatenate(y_desireds, axis=0)
 
-        print(y_preds.shape)
-        print(y_desireds.shape)
+        #print(y_preds.shape)
+        #print(y_desireds.shape)
         X_desireds, X_preds, X_errors = reconstruct_pose_modified(y_desireds, y_preds, robot_choice)
         X_errors_report = np.array([[X_errors.min(axis=0)],
                                     [X_errors.mean(axis=0)],
@@ -119,12 +118,32 @@ def validate(model, val_loader, device, robot_name):
     return monitored_total_loss, results
 
 # --- Training Loop ---
-def train_loop(model, train_loader, val_loader, max_epochs=10, lr=1e-4, robot_name="panda"):
+def train_loop(model, train_loader, val_loader, max_epochs=10, lr=1e-4, robot_name="panda", save_on_wand=True):
+    
+    save_path = "results"
+    if not os.path.exists(save_path):
+        os.makedirs(save_path)
+
+    print(f"[Results saved in: {save_path}]")
+    
+    
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     print(f"[Training on device: {device}]")
     model.to(device)
     optimizer = torch.optim.AdamW(model.parameters(), lr=lr)
     loss_fn = nn.MSELoss()
+
+    robot_choice = get_robot_choice(robot_name)
+
+    if save_on_wand:
+        run = wandb.init(
+            entity="jacketdembys",
+            project = "diffik",
+            group = f"MLP_{robot_choice}_Data_2.5M",
+            name = f"MLP_{robot_choice}_Data_2.5M_Bs_128_Opt_AdamW"
+        )
+
+    best_pose_loss = float('inf')
 
     for epoch in range(max_epochs):
         model.train()
@@ -146,7 +165,7 @@ def train_loop(model, train_loader, val_loader, max_epochs=10, lr=1e-4, robot_na
             epoch_loss += loss.item()
 
         train_loss = epoch_loss / len(train_loader)
-        val_loss, val_results = validate(model, val_loader, device, robot_name)
+        val_loss, val_results = validate(model, val_loader, device, robot_choice)
         
         X_errors = val_results["X_errors_report"]
         X_errors_r = X_errors[:,:6]
@@ -156,13 +175,38 @@ def train_loop(model, train_loader, val_loader, max_epochs=10, lr=1e-4, robot_na
         avg_orientation_error = X_errors_r[1,3:].mean()
 
                
-        print(f"Train Loss: {train_loss:.6f} | Val Loss: {val_loss:.6f} | xyz: {avg_position_error:.2f} | RPY: {avg_orientation_error:.2f}")
-        #print(f"avg_position_error (mm): {avg_position_error}")
-        #print(f"avg_orientation_error (deg): {avg_orientation_error}")
+        print(f"Train Loss: {train_loss:.6f} | Val Loss: {val_loss:.6f} | xyz(mm): {avg_position_error:.2f} | RPY(deg): {avg_orientation_error:.2f}")
+
+        pose_loss = (avg_position_error + avg_position_error)/2
+        if pose_loss < best_pose_loss:
+            best_pose_loss = pose_loss
+            best_epoch = epoch
+            
+
+            torch.save(model.state_dict(), save_path+f'/best_epoch_{best_epoch}.pth')
+            artifact = wandb.Artifact(name=f"MLP_{robot_choice}_Data_2.5M_Bs_128_Opt_AdamW", 
+                                    type='model')
+            artifact.add_file(save_path+f'/best_epoch_{best_epoch}.pth')
+            run.log_artifact(artifact)
+
+
+
+        train_metrics= {
+                "train/train_loss": train_loss,
+            }
+        
+        val_metrics = {
+                "val/val_loss": val_loss,
+                "val/xyz(mm)": avg_position_error,
+                "val/RPY(deg)": avg_orientation_error
+            }
+        wandb.log({**train_metrics, **val_metrics})
 
         end_time = time.monotonic()
         epoch_mins, epoch_secs = epoch_time(start_time, end_time)
         print(f'Epoch Time: {epoch_mins}m {epoch_secs}s')
+
+    wandb.finish()
                 
 
 # --- Main ---
@@ -174,6 +218,7 @@ if __name__ == "__main__":
     pose_dim = 7
     robot_name = "panda"
     seed_choice, seed_number = True, 0
+    save_on_wand = True
 
     if seed_choice:   
         random.seed(seed_number)
@@ -196,4 +241,4 @@ if __name__ == "__main__":
     val_loader = DataLoader(val_dataset, batch_size=batch_size)
 
     model = DiffIKDenoiser(dof=dof, pose_dim=pose_dim)
-    train_loop(model, train_loader, val_loader, max_epochs=max_epochs, robot_name=robot_name)
+    train_loop(model, train_loader, val_loader, max_epochs=max_epochs, robot_name=robot_name, save_on_wand=save_on_wand)
