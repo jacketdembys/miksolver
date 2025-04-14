@@ -4,32 +4,25 @@ from torch.utils.data import Dataset, DataLoader
 import os
 import numpy as np
 
-# Dataset loader
+# --- Dataset Loader ---
 class DiffIKDataset(Dataset):
     def __init__(self, filename_D, filename_Q):
-        # Load .npy files using NumPy
-        self.q = torch.from_numpy(np.load(filename_Q)).float() #.to(device)
-        self.pose = torch.from_numpy(np.load(filename_D)).float() #.to(device)
-        
-        print(f"\nLoaded Dataset:\nq.shape: {self.q.shape}\npose.shape: {self.pose.shape}")
-        print(f"Loaded Dataset initially on --> device: {self.q.device}")
-
-        assert self.q.shape[0] == self.pose.shape[0], "Mismatch in sample count"
+        self.q = torch.from_numpy(np.load(filename_Q)).float()
+        self.pose = torch.from_numpy(np.load(filename_D)).float()
+        assert self.q.shape[0] == self.pose.shape[0]
 
     def __len__(self):
         return self.q.shape[0]
 
     def __getitem__(self, idx):
-        return {
-            "q": self.q[idx],
-            "pose": self.pose[idx],
-        }
-    
+        return {"q": self.q[idx], "pose": self.pose[idx]}
 
-# Diffusion Architecture
+# --- Diffusion MLP Architecture ---
 class DiffIKDenoiser(nn.Module):
     def __init__(self, dof=7, pose_dim=7, hidden_dim=512, time_embed_dim=64):
         super().__init__()
+        self.dof = dof
+        self.num_timesteps = 1000
         self.time_embed = nn.Sequential(
             nn.Linear(1, time_embed_dim), nn.SiLU(), nn.Linear(time_embed_dim, time_embed_dim)
         )
@@ -47,98 +40,89 @@ class DiffIKDenoiser(nn.Module):
         x = torch.cat([q_t, pose, t_embed], dim=-1)
         return self.net(x)
 
+# --- Sampling Function ---
+@torch.no_grad()
+def sample(model, pose, ddim_steps=50):
+    model.eval()
+    B = pose.shape[0]
+    q = torch.randn(B, model.dof).to(pose.device)
+    pose = pose.repeat_interleave(1, dim=0)
+    for t in reversed(range(1, ddim_steps + 1)):
+        t_tensor = torch.full((q.size(0),), t, device=q.device, dtype=torch.long)
+        beta = 1e-4 + (t_tensor / model.num_timesteps).unsqueeze(-1)
+        noise_pred = model(q, pose, t_tensor)
+        q = q - beta * noise_pred
+    return q
 
-# Training loop function
-def train_loop(model, train_loader, val_loader, robot, max_epochs=1, lr=1e-4):
-    print("Setting up training...")
+# --- Validation ---
+def validate(model, val_loader, device):
+    model.eval()
+    total_loss = 0.0
+    loss_fn = nn.MSELoss()
+    with torch.no_grad():
+        for batch in val_loader:
+            q = batch["q"].to(device)
+            pose = batch["pose"].to(device)
+            noise = torch.randn_like(q)
+            t = torch.randint(0, model.num_timesteps, (q.size(0),), device=device)
+            beta = 1e-4 + (t / model.num_timesteps).unsqueeze(-1)
+            q_t = q + beta * noise
+            noise_pred = model(q_t, pose, t)
+            loss = loss_fn(noise_pred, noise)
+            total_loss += loss.item()
+    return total_loss / len(val_loader)
+
+# --- Training Loop ---
+def train_loop(model, train_loader, val_loader, max_epochs=10, lr=1e-4):
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-    print(f"Training on device: {device}")
-    
-    model = model.to(device)
+    print(f"[Training on device: {device}]")
+    model.to(device)
     optimizer = torch.optim.AdamW(model.parameters(), lr=lr)
     loss_fn = nn.MSELoss()
-    best_val_loss = float('inf')
-
-    print("Starting training loop...")
 
     for epoch in range(max_epochs):
-        print(f"\n[Epoch {epoch}]")
         model.train()
+        epoch_loss = 0.0
+        print(f"\n[Epoch {epoch+1}/{max_epochs}]")
+        for batch in train_loader:
+            q = batch["q"].to(device)
+            pose = batch["pose"].to(device)
+            noise = torch.randn_like(q)
+            t = torch.randint(0, model.num_timesteps, (q.size(0),), device=device)
+            beta = 1e-4 + (t / model.num_timesteps).unsqueeze(-1)
+            q_t = q + beta * noise
+            noise_pred = model(q_t, pose, t)
+            loss = loss_fn(noise_pred, noise)
+            optimizer.zero_grad()
+            loss.backward()
+            optimizer.step()
+            epoch_loss += loss.item()
 
-        for batch_idx, batch in enumerate(train_loader):
-            print(f"  Batch {batch_idx} - Loading data")
-            try:
-                q = batch["q"].to(device)
-                pose = batch["pose"].to(device)
-                print(f"    q.device: {q.device}, pose.device: {pose.device}")
+        train_loss = epoch_loss / len(train_loader)
+        val_loss = validate(model, val_loader, device)
+        print(f"Train Loss: {train_loss:.6f} | Val Loss: {val_loss:.6f}")
 
-                noise = torch.randn_like(q)
-                print("    Noise generated")
-
-                t = torch.randint(0, model.num_timesteps, (q.size(0),), device=q.device)
-                print(f"    t.shape: {t.shape}, t.device: {t.device}")
-
-                beta = 1e-4 + (t / model.num_timesteps).unsqueeze(-1)
-                q_t = q + beta * noise
-
-                noise_pred = model(q_t, pose, t)
-                loss = loss_fn(noise_pred, noise)
-                optimizer.zero_grad()
-                loss.backward()
-                optimizer.step()
-
-                print(f"    ✅ Loss: {loss.item():.6f}")
-                break  # only one batch to debug
-            except Exception as e:
-                print("🔥 ERROR DURING BATCH PROCESSING:", str(e))
-                import traceback
-                traceback.print_exc()
-                return
-
-
+# --- Main ---
 if __name__ == "__main__":
+    torch.manual_seed(0)
 
-    
-    # --- Configurable Parameters ---
     batch_size = 128
-    max_epochs = 100
-    disable_wandb = False  # Set True if using Weights & Biases
+    max_epochs = 20
     dof = 7
     pose_dim = 7
 
-    torch.manual_seed(0)
-    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-    robot = "panda"
-
-
-    filename_Dtr = '/home/miksolver/ik_datasets/panda/endpoints_tr.npy'
-    filename_Qtr = '/home/miksolver/ik_datasets/panda/samples_tr.npy'
-    train_dataset = DiffIKDataset(filename_Dtr, filename_Qtr)
-    train_loader = DataLoader(
-        train_dataset,
-        batch_size=batch_size,
-        shuffle=True,
-        num_workers=0,
-        pin_memory=False,
-        drop_last=False,
+    dataset_path = "/home/miksolver/ik_datasets/panda"
+    train_dataset = DiffIKDataset(
+        os.path.join(dataset_path, "endpoints_tr.npy"),
+        os.path.join(dataset_path, "samples_tr.npy")
+    )
+    val_dataset = DiffIKDataset(
+        os.path.join(dataset_path, "endpoints_te.npy"),
+        os.path.join(dataset_path, "samples_te.npy")
     )
 
+    train_loader = DataLoader(train_dataset, batch_size=batch_size, shuffle=True)
+    val_loader = DataLoader(val_dataset, batch_size=batch_size)
 
-    filename_Dte = '/home/miksolver/ik_datasets/panda/endpoints_te.npy'
-    filename_Qte = '/home/miksolver/ik_datasets/panda/samples_te.npy'
-    val_dataset = DiffIKDataset(filename_Dte, filename_Qte) 
-    val_loader = DataLoader(val_dataset, 
-                            batch_size=batch_size)
-    
-
-    model = DiffIKDenoiser(dof=dof, pose_dim=pose_dim) #.to(device)
-    model.dof = dof
-    model.num_timesteps = 1000
-    print(model)
-
-    train_loop(model, 
-                train_loader, 
-                val_loader, 
-                robot, 
-                max_epochs=max_epochs
-                )
+    model = DiffIKDenoiser(dof=dof, pose_dim=pose_dim)
+    train_loop(model, train_loader, val_loader, max_epochs=max_epochs)
