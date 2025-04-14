@@ -24,7 +24,7 @@ class DiffIKDataset(Dataset):
 
 # --- Diffusion MLP Architecture ---
 class DiffIKDenoiser(nn.Module):
-    def __init__(self, dof=7, pose_dim=7, hidden_dim=512, time_embed_dim=64):
+    def __init__(self, dof=7, pose_dim=7, hidden_dim=1024, time_embed_dim=128):
         super().__init__()
         self.dof = dof
         self.num_timesteps = 1000
@@ -37,6 +37,7 @@ class DiffIKDenoiser(nn.Module):
             nn.Linear(input_dim, hidden_dim), nn.SiLU(), nn.Dropout(0.1),
             nn.Linear(hidden_dim, hidden_dim), nn.SiLU(), nn.Dropout(0.1),
             nn.Linear(hidden_dim, hidden_dim), nn.SiLU(), nn.Dropout(0.1),
+            nn.Linear(hidden_dim, hidden_dim), nn.SiLU(), nn.Dropout(0.1),
             nn.Linear(hidden_dim, dof)
         )
 
@@ -47,14 +48,15 @@ class DiffIKDenoiser(nn.Module):
 
 # --- Sampling Function ---
 @torch.no_grad()
-def sample(model, pose, ddim_steps=50):
+def sample(model, pose, ddim_steps=100):
     model.eval()
     B = pose.shape[0]
     q = torch.randn(B, model.dof).to(pose.device)
     pose = pose.repeat_interleave(1, dim=0)
     for t in reversed(range(1, ddim_steps + 1)):
         t_tensor = torch.full((q.size(0),), t, device=q.device, dtype=torch.long)
-        beta = 1e-4 + (t_tensor / model.num_timesteps).unsqueeze(-1)
+        #beta = 1e-4 + (t_tensor / model.num_timesteps).unsqueeze(-1)
+        beta = 1e-4 + (0.02 - 1e-4) * (t_tensor / model.num_timesteps).unsqueeze(-1)
         noise_pred = model(q, pose, t_tensor)
         q = q - beta * noise_pred
     return q
@@ -76,7 +78,8 @@ def validate(model, val_loader, device, robot_choice):
             # compute denoising loss
             noise = torch.randn_like(q_gt)
             t = torch.randint(0, model.num_timesteps, (q_gt.size(0),), device=device)
-            beta = 1e-4 + (t / model.num_timesteps).unsqueeze(-1)
+            #beta = 1e-4 + (t / model.num_timesteps).unsqueeze(-1)
+            beta = 1e-4 + (0.02 - 1e-4) * (t / model.num_timesteps).unsqueeze(-1)
             q_t = q_gt + beta * noise
             noise_pred = model(q_t, pose_gt, t)
             loss = loss_fn(noise_pred, noise)
@@ -228,7 +231,8 @@ if __name__ == "__main__":
         torch.cuda.manual_seed(seed_number)
         torch.backends.cudnn.deterministic = True
 
-    dataset_path = f"/home/miksolver/ik_datasets/{robot_name}"
+    #dataset_path = f"/home/miksolver/ik_datasets/{robot_name}"
+    dataset_path = f"ik_datasets/{robot_name}"
     train_dataset = DiffIKDataset(
         os.path.join(dataset_path, "endpoints_tr.npy"),
         os.path.join(dataset_path, "samples_tr.npy")
@@ -237,7 +241,7 @@ if __name__ == "__main__":
         os.path.join(dataset_path, "endpoints_te.npy"),
         os.path.join(dataset_path, "samples_te.npy")
     )
-    val_indices = np.random.choice(len(val_dataset), size=2000, replace=False)
+    val_indices = np.random.choice(len(val_dataset), size=1000, replace=False)
     val_subset = Subset(val_dataset, val_indices)
 
     train_loader = DataLoader(train_dataset, batch_size=batch_size, shuffle=True)
