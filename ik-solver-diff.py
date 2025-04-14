@@ -4,7 +4,8 @@ from torch.utils.data import Dataset, DataLoader
 import os
 import numpy as np
 import sys
-from utils import *
+import random
+from utils import get_robot_choice, reconstruct_pose_modified
 
 # --- Dataset Loader ---
 class DiffIKDataset(Dataset):
@@ -153,21 +154,28 @@ def train_loop(model, train_loader, val_loader, max_epochs=10, lr=1e-4, robot_na
         avg_orientation_error = X_errors_r[1,3:].mean()
 
                
-        print(f"Train Loss: {train_loss:.6f} | Val Loss: {val_loss:.6f}")
-        print(f"avg_position_error (mm): {avg_position_error}")
-        print(f"avg_orientation_error (deg): {avg_orientation_error}")
+        print(f"Train Loss: {train_loss:.6f} | Val Loss: {val_loss:.6f} | xyz: {avg_position_error:.6f} | RPY: {avg_orientation_error:.6f}")
+        #print(f"avg_position_error (mm): {avg_position_error}")
+        #print(f"avg_orientation_error (deg): {avg_orientation_error}")
 
 
 
 # --- Main ---
 if __name__ == "__main__":
-    torch.manual_seed(0)
 
     batch_size = 128
     max_epochs = 1
     dof = 7
     pose_dim = 7
     robot_name = "panda"
+    seed_choice, seed_number = True, 0
+
+    if seed_choice:   
+        random.seed(seed_number)
+        np.random.seed(seed_number)
+        torch.manual_seed(seed_number)
+        torch.cuda.manual_seed(seed_number)
+        torch.backends.cudnn.deterministic = True
 
     dataset_path = f"/home/miksolver/ik_datasets/{robot_name}"
     train_dataset = DiffIKDataset(
