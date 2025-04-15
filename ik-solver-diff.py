@@ -32,15 +32,37 @@ class DiffIKDataset(Dataset):
         return {"q": self.q[idx], "pose": self.pose[idx]}
 
 # --- Diffusion MLP Architecture ---
+# class DiffIKDenoiser(nn.Module):
+#     def __init__(self, dof=7, pose_dim=7, hidden_dim=512, time_embed_dim=64):
+#         super().__init__()
+#         self.dof = dof
+#         self.num_timesteps = 1000
+#         self.time_embed = nn.Sequential(
+#             nn.Linear(1, time_embed_dim), nn.SiLU(), nn.Linear(time_embed_dim, time_embed_dim)
+#         )
+#         input_dim = dof + pose_dim + time_embed_dim
+#         self.net = nn.Sequential(
+#             nn.LayerNorm(input_dim),
+#             nn.Linear(input_dim, hidden_dim), nn.SiLU(), nn.Dropout(0.1),
+#             nn.Linear(hidden_dim, hidden_dim), nn.SiLU(), nn.Dropout(0.1),
+#             nn.Linear(hidden_dim, hidden_dim), nn.SiLU(), nn.Dropout(0.1),
+#             nn.Linear(hidden_dim, dof)
+#         )
+
+#     def forward(self, q_t, pose, t):
+#         t_embed = self.time_embed(t.unsqueeze(-1).float())
+#         x = torch.cat([q_t, pose, t_embed], dim=-1)
+#         return self.net(x)
+
 class DiffIKDenoiser(nn.Module):
     def __init__(self, dof=7, pose_dim=7, hidden_dim=512, time_embed_dim=64):
         super().__init__()
         self.dof = dof
         self.num_timesteps = 1000
-        self.time_embed = nn.Sequential(
-            nn.Linear(1, time_embed_dim), nn.SiLU(), nn.Linear(time_embed_dim, time_embed_dim)
-        )
+        self.time_embed_dim = time_embed_dim
+
         input_dim = dof + pose_dim + time_embed_dim
+
         self.net = nn.Sequential(
             nn.LayerNorm(input_dim),
             nn.Linear(input_dim, hidden_dim), nn.SiLU(), nn.Dropout(0.1),
@@ -49,8 +71,21 @@ class DiffIKDenoiser(nn.Module):
             nn.Linear(hidden_dim, dof)
         )
 
+    def _sinusoidal_time_embedding(self, t, dim):
+        """
+        t: Tensor of shape [B] (timesteps)
+        dim: int, embedding dimension (must be even)
+        Returns: [B, dim]
+        """
+        half_dim = dim // 2
+        emb = math.log(10000) / (half_dim - 1)
+        emb = torch.exp(torch.arange(half_dim, device=t.device) * -emb)
+        emb = t.unsqueeze(1) * emb.unsqueeze(0)
+        emb = torch.cat([torch.sin(emb), torch.cos(emb)], dim=1)
+        return emb  # [B, dim]
+
     def forward(self, q_t, pose, t):
-        t_embed = self.time_embed(t.unsqueeze(-1).float())
+        t_embed = self._sinusoidal_time_embedding(t.float(), self.time_embed_dim)
         x = torch.cat([q_t, pose, t_embed], dim=-1)
         return self.net(x)
 
@@ -231,7 +266,8 @@ if __name__ == "__main__":
         torch.cuda.manual_seed(seed_number)
         torch.backends.cudnn.deterministic = True
 
-    dataset_path = f"/home/miksolver/ik_datasets/{robot_name}"
+    #dataset_path = f"/home/miksolver/ik_datasets/{robot_name}"
+    dataset_path = f"ik_datasets/{robot_name}"
     train_dataset = DiffIKDataset(
         os.path.join(dataset_path, "endpoints_tr.npy"),
         os.path.join(dataset_path, "samples_tr.npy")
