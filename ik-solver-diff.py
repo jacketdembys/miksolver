@@ -7,7 +7,10 @@ import sys
 import time
 import random
 import wandb
-from utils import get_robot_choice, reconstruct_pose_modified, epoch_time
+import math
+import pandas as pd
+from sklearn.model_selection import train_test_split
+from utils import get_robot_choice, reconstruct_pose_modified, epoch_time, count_parameters
 
 # --- Dataset Loader ---
 class DiffIKDataset(Dataset):
@@ -30,6 +33,8 @@ class DiffIKDataset(Dataset):
 
     def __getitem__(self, idx):
         return {"q": self.q[idx], "pose": self.pose[idx]}
+
+
 
 # --- Diffusion MLP Architecture ---
 # class DiffIKDenoiser(nn.Module):
@@ -54,20 +59,85 @@ class DiffIKDataset(Dataset):
 #         x = torch.cat([q_t, pose, t_embed], dim=-1)
 #         return self.net(x)
 
+
+
+# Denoiser with Residual Network
+class ResBlock(nn.Module):
+    def __init__(self, dim, dropout=0.1):
+        super().__init__()
+        self.block = nn.Sequential(
+            #nn.LayerNorm(dim),
+            nn.Linear(dim, dim),
+            nn.LeakyReLU(),
+            #nn.Dropout(dropout),
+            nn.Linear(dim, dim),
+        )
+
+    def forward(self, x):
+        return x + self.block(x)
+
+
 class DiffIKDenoiser(nn.Module):
-    def __init__(self, dof=7, pose_dim=7, hidden_dim=512, time_embed_dim=64):
+    def __init__(self, dof=7, pose_dim=7, hidden_dim=512, time_embed_dim=64, pose_embed_dim=64, num_blocks=4):
         super().__init__()
         self.dof = dof
         self.num_timesteps = 1000
         self.time_embed_dim = time_embed_dim
+        self.pose_embed_dim = pose_embed_dim
 
-        input_dim = dof + pose_dim + time_embed_dim
+        self.pose_embed = nn.Sequential(
+            nn.Linear(pose_dim, pose_embed_dim),
+            nn.LeakyReLU(),
+            nn.Linear(pose_embed_dim, pose_embed_dim),
+        )
+
+        input_dim = dof + pose_embed_dim + time_embed_dim
+        self.input_proj = nn.Linear(input_dim, hidden_dim)
+
+        self.res_blocks = nn.Sequential(*[ResBlock(hidden_dim) for _ in range(num_blocks)])
+
+        self.output_layer = nn.Linear(hidden_dim, dof)
+
+    def _sinusoidal_time_embedding(self, t, dim):
+        half_dim = dim // 2
+        emb = math.log(10000) / (half_dim - 1)
+        emb = torch.exp(torch.arange(half_dim, device=t.device) * -emb)
+        emb = t.unsqueeze(1) * emb.unsqueeze(0)
+        emb = torch.cat([torch.sin(emb), torch.cos(emb)], dim=1)
+        return emb
+
+    def forward(self, q_t, pose, t):
+        t_embed = self._sinusoidal_time_embedding(t.float(), self.time_embed_dim)
+        pose_embed = self.pose_embed(pose)
+        x = torch.cat([q_t, pose_embed, t_embed], dim=-1)
+        x = self.input_proj(x)
+        x = self.res_blocks(x)
+        return self.output_layer(x)
+
+
+# Denoiser with MLP
+class DiffIKDenoiserMLP(nn.Module):
+    def __init__(self, dof=7, pose_dim=7, hidden_dim=1024, time_embed_dim=64, pose_embed_dim=64):
+        super().__init__()
+        self.dof = dof
+        self.num_timesteps = 1000
+        self.time_embed_dim = time_embed_dim
+        self.pose_embed_dim = pose_embed_dim
+
+        self.pose_embed = nn.Sequential(
+            nn.Linear(pose_dim, pose_embed_dim),
+            nn.LeakyReLU(),
+            nn.Linear(pose_embed_dim, pose_embed_dim),
+        )
+
+        input_dim = dof + pose_embed_dim + time_embed_dim
 
         self.net = nn.Sequential(
-            nn.LayerNorm(input_dim),
-            nn.Linear(input_dim, hidden_dim), nn.SiLU(), nn.Dropout(0.1),
-            nn.Linear(hidden_dim, hidden_dim), nn.SiLU(), nn.Dropout(0.1),
-            nn.Linear(hidden_dim, hidden_dim), nn.SiLU(), nn.Dropout(0.1),
+            #nn.LayerNorm(input_dim),
+            nn.Linear(input_dim, hidden_dim), nn.LeakyReLU(), #nn.Dropout(0.1),
+            nn.Linear(hidden_dim, hidden_dim), nn.LeakyReLU(), #nn.Dropout(0.1),
+            nn.Linear(hidden_dim, hidden_dim), nn.LeakyReLU(), #nn.Dropout(0.1),
+            nn.Linear(hidden_dim, hidden_dim), nn.LeakyReLU(), #nn.Dropout(0.1),
             nn.Linear(hidden_dim, dof)
         )
 
@@ -86,7 +156,8 @@ class DiffIKDenoiser(nn.Module):
 
     def forward(self, q_t, pose, t):
         t_embed = self._sinusoidal_time_embedding(t.float(), self.time_embed_dim)
-        x = torch.cat([q_t, pose, t_embed], dim=-1)
+        pose_embed = self.pose_embed(pose)
+        x = torch.cat([q_t, pose_embed, t_embed], dim=-1)
         return self.net(x)
 
 # --- Sampling Function ---
@@ -252,7 +323,7 @@ def train_loop(model, train_loader, val_loader, max_epochs=10, lr=1e-4, robot_na
 
 # --- Main ---
 if __name__ == "__main__":
-    batch_size = 128
+    batch_size = 512
     max_epochs = 1000
     dof = 7
     pose_dim = 7
@@ -266,6 +337,7 @@ if __name__ == "__main__":
         torch.cuda.manual_seed(seed_number)
         torch.backends.cudnn.deterministic = True
 
+    
     #dataset_path = f"/home/miksolver/ik_datasets/{robot_name}"
     dataset_path = f"ik_datasets/{robot_name}"
     train_dataset = DiffIKDataset(
@@ -276,11 +348,14 @@ if __name__ == "__main__":
         os.path.join(dataset_path, "endpoints_te.npy"),
         os.path.join(dataset_path, "samples_te.npy")
     )
-    val_indices = np.random.choice(len(val_dataset), size=2000, replace=False)
+
+    val_indices = np.random.choice(len(val_dataset), size=1000, replace=False)
     val_subset = Subset(val_dataset, val_indices)
 
+    
     train_loader = DataLoader(train_dataset, batch_size=batch_size, shuffle=True)
     val_loader = DataLoader(val_subset, batch_size=batch_size)
 
     model = DiffIKDenoiser(dof=dof, pose_dim=pose_dim)
+    print("Model Trainable Parameters: {}".format(count_parameters(model)))
     train_loop(model, train_loader, val_loader, max_epochs=max_epochs, robot_name=robot_name, save_on_wand=save_on_wand)
