@@ -96,7 +96,8 @@ else:
     robot_choice = '7DoF-7R-Panda'   #'7DoF-7R-Panda' '7DoF-GP66' 
     data_choice = args.dataset
 
-print("\nDEBUG\n".format(robot_choice))
+print("\nDEBUG: {}".format(args.dataset))
+print("DEBUG: {}\n".format(robot_choice))
 
 # read from path script
 #for joint_variation in range(1,2):

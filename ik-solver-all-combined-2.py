@@ -316,8 +316,8 @@ if __name__ == '__main__':
         torch.backends.cudnn.deterministic = True
     ## train and validate
     # load the dataset
-    print("\nDEBUG: {}\n".format(robot_choice))
-    print("\nDEBUG: {}\n".format(dataset_type))
+    print("\nDEBUG: {}".format(robot_choice))
+    print("DEBUG: {}\n".format(dataset_type))
     train_data_loader, test_data_loader, train_test_val_all, sc_in = load_all_dataset_2(data, n_DoF, batch_size, robot_choice, dataset_type, device, input_dim, robot_list, robot_list_test)
 
 
