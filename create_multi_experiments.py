@@ -74,7 +74,7 @@ model_str = args.model
 
 if model_str == "rmlp":
     model = "ResMLP" 
-if model_str == "dmlp":
+elif model_str == "dmlp":
     model = "DenseMLP3" 
 elif model_str == "mlp":
     model = "MLP"
@@ -86,10 +86,10 @@ elif model_str == "gpt3":
 if args.dataset == "all6":
     robot_choice = 'All-6DoF'   #'7DoF-7R-Panda' '7DoF-GP66' 'All-6DoF' 'All-7DoF' 'All-DoFs' '3-to-10DoF'
     data_choice = 'combine-6DoF'
-if args.dataset == "all7":
+elif args.dataset == "all7":
     robot_choice = 'All-7DoF'   #'7DoF-7R-Panda' '7DoF-GP66' 'All-6DoF' 'All-7DoF' 'All-DoFs' '3-to-10DoF'
     data_choice = 'combine-7DoF'
-if args.dataset == "all67":
+elif args.dataset == "all67":
     robot_choice = 'All-67DoF'   #'7DoF-7R-Panda' '7DoF-GP66' 'All-6DoF' 'All-7DoF' 'All-DoFs' '3-to-10DoF'
     data_choice = 'combine-up-to-7DoF'
 else:
