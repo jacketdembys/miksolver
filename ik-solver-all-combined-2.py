@@ -187,7 +187,7 @@ if __name__ == '__main__':
                           "6DoF-6R-UR10", "6DoF-6R-UR3", "6DoF-6R-UR5", "6DoF-6R-Puma260", "6DoF-2RP3R-Stanford"]
             
 
-            robot_list_test = ["6DoF-6R-UR10", "6DoF-6R-Puma260"]
+            robot_list_test = ["6DoF-6R-IRB140", "6DoF-6R-KR5"]
 
             data = np.zeros((dataset_samples, 24, len(robot_list)))           
             for i in range(len(robot_list)):
@@ -221,7 +221,7 @@ if __name__ == '__main__':
                             
             robot_list = robot_list_6 + robot_list_7
 
-            robot_list_test = ["6DoF-6R-UR10", "6DoF-6R-Puma260", "7DoF-7R-WAM", "7DoF-7R-Sawyer"]
+            robot_list_test = ["6DoF-6R-IRB140", "6DoF-6R-KR5", "7DoF-7R-WAM", "7DoF-7R-Sawyer"]
 
             data = np.zeros((dataset_samples, 26, len(robot_list)))           
             for i in range(len(robot_list)):
@@ -458,7 +458,7 @@ if __name__ == '__main__':
         run = wandb.init(
             entity="jacketdembys",
             project = "ik-steps-2",                
-            group = "Final_IROS_25_"+network_type+"_"+"Combined_Dataset_"+str(dataset_samples)+"_Scale_"+str(int(scale))+"_"+dataset_type+"_"+loss_choice,  # "_seq", "_1_to_1"
+            group = "Review_IROS_25_"+network_type+"_"+"Combined_Dataset_"+str(dataset_samples)+"_Scale_"+str(int(scale))+"_"+dataset_type+"_"+loss_choice,  # "_seq", "_1_to_1"
             #group = "Dataset_Scale_"+str(int(scale)),
             name = network_type+"_"+robot_choice+"_" \
                     + save_layers_str + "_neurons_" + str(neurons) + "_batch_" + str(batch_size) +"_" \

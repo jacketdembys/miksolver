@@ -198,7 +198,8 @@ if __name__ == '__main__':
                           "6DoF-6R-UR10", "6DoF-6R-UR3", "6DoF-6R-UR5", "6DoF-6R-Puma260", "6DoF-2RP3R-Stanford"]
             
 
-            robot_list_test = ["6DoF-6R-UR10", "6DoF-6R-Puma260"]
+            #robot_list_test = ["6DoF-6R-UR10", "6DoF-6R-Puma260"]
+            robot_list_test = ["6DoF-6R-IRB140", "6DoF-6R-KR5"]
 
             data = np.zeros((dataset_samples, 24, len(robot_list)))           
             for i in range(len(robot_list)):
@@ -232,7 +233,8 @@ if __name__ == '__main__':
                             
             robot_list = robot_list_6 + robot_list_7
 
-            robot_list_test = ["6DoF-6R-UR10", "6DoF-6R-Puma260", "7DoF-7R-WAM", "7DoF-7R-Sawyer"]
+            #robot_list_test = ["6DoF-6R-UR10", "6DoF-6R-Puma260", "7DoF-7R-WAM", "7DoF-7R-Sawyer"]
+            robot_list_test = ["6DoF-6R-IRB140", "6DoF-6R-KR5", "7DoF-7R-WAM", "7DoF-7R-Sawyer"]
 
             data = np.zeros((dataset_samples, 26, len(robot_list)))           
             for i in range(len(robot_list)):
