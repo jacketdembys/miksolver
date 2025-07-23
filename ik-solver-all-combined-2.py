@@ -452,7 +452,9 @@ if __name__ == '__main__':
     """
 
     # Modif_Err   Biternion    Modif_Err_2_  fkloss_Dataset_
-
+    print("\nDEBUG\n".format(robot_choice))
+    print("\nDEBUG\n".format(dataset_type))
+    
 
     if save_option == "cloud":
         run = wandb.init(
